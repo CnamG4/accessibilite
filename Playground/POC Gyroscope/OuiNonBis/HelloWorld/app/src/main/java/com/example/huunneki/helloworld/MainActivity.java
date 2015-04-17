@@ -29,6 +29,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
+    private Sensor magnetometer;
 
     private static final float NS2S = 1.0f / 1000000000.0f;
     private final float[] deltaRotationVector = new float[4];
@@ -47,7 +48,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         timestamp = 0;
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        magnetometer = senSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        senSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
     }
     protected void onPause() {
         super.onPause();
@@ -82,7 +86,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         return super.onOptionsItemSelected(item);
     }
 
-    public void onSensorChanged(SensorEvent event) {
+    /*public void onSensorChanged(SensorEvent event) {
         Sensor mySensor = event.sensor;
         // This timestep's delta rotation to be multiplied by the current rotation
         // after computing it from the gyro sample data.
@@ -91,7 +95,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             long dT = currTime - timestamp;
             if(dT >= 400) {
                 timestamp = currTime;
-
+                float test[];
+                float mdr[];
+                senSensorManager.getOrientation(mdr, test);
+                System.out.println(test);
                 float axisX = event.values[0];
                 float axisY = event.values[1];
                 float axisZ = event.values[2];
@@ -109,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 text.setText("X : " + axisX +"\nY : " + axisY + "\nZ : " + axisZ + "\nAngleXY : " + myAngleXY);
                 text2.setText("AngleXZ : " + myAngleXZ);
                 text3.setText("AngleYZ : " + myAngleYZ);
-                if(Math.abs(myAngleXY - angleXY) >= 15) {
+                if(Math.abs(myAngleXY - angleXY) >= 30) {
                     text.setText("NICE");
                     angleXY = myAngleXY;
                 } else {
@@ -126,6 +133,27 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             angleXZ = (float) (Math.atan2(axisX, axisZ)/(Math.PI/180));
             angleYZ = (float) (Math.atan2(axisY, axisZ)/(Math.PI/180));
             timestamp = System.currentTimeMillis();
+        }
+    }*/
+
+    float[] mGravity;
+    float[] mGeomagnetic;
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            mGravity = event.values;
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+            mGeomagnetic = event.values;
+        if (mGravity != null && mGeomagnetic != null) {
+            float R[] = new float[9];
+            float I[] = new float[9];
+            boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+            if (success) {
+                float orientation[] = new float[3];
+                SensorManager.getOrientation(R, orientation);
+                float azimut = orientation[0]; // orientation contains: azimut, pitch and roll
+                float pitch = orientation[1];
+                float roll = orientation[2];
+            }
         }
     }
 

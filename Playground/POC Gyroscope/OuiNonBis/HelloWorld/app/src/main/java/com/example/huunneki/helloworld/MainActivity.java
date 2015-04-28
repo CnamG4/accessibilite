@@ -18,6 +18,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import com.example.huunneki.helloworld.R;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,13 +32,15 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Sensor senAccelerometer;
     private Sensor magnetometer;
 
-    private static final float NS2S = 1.0f / 1000000000.0f;
-    private final float[] deltaRotationVector = new float[4];
     private long timestamp;
+    private long timestampValidate;
     private long currTime;
-    private float angleXY;
-    private float angleXZ;
-    private float angleYZ;
+
+    private float oldYaw;
+    private float oldRoll;
+    private float oldPitch;
+
+    private boolean canGo;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -45,14 +48,21 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        timestamp = 0;
+        timestamp = System.currentTimeMillis();
+        timestampValidate = System.currentTimeMillis();
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         magnetometer = senSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-        senSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
+        senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        senSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
+
+        oldYaw = 0;
+        oldPitch = 0;
+        oldRoll = 0;
+        canGo = true;
     }
+
     protected void onPause() {
         super.onPause();
         senSensorManager.unregisterListener(this);
@@ -139,20 +149,77 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     float[] mGravity;
     float[] mGeomagnetic;
     public void onSensorChanged(SensorEvent event) {
+
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
             mGravity = event.values;
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
             mGeomagnetic = event.values;
         if (mGravity != null && mGeomagnetic != null) {
-            float R[] = new float[9];
-            float I[] = new float[9];
-            boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+
+            // get the text fields
+            TextView text = (TextView) findViewById(R.id.X);
+            TextView text2 = (TextView) findViewById(R.id.Y);
+            TextView text3 = (TextView) findViewById(R.id.Z);
+            float Rotation[] = new float[9];
+            float temp[] = new float[9];
+
+            boolean success = SensorManager.getRotationMatrix(temp, null, mGravity, mGeomagnetic);
+
+            currTime = System.currentTimeMillis();
             if (success) {
+
+                //Remap to camera's point-of-view
+                SensorManager.remapCoordinateSystem(temp,
+                        SensorManager.AXIS_X,
+                        SensorManager.AXIS_Z, Rotation);
+
+
                 float orientation[] = new float[3];
-                SensorManager.getOrientation(R, orientation);
-                float azimut = orientation[0]; // orientation contains: azimut, pitch and roll
-                float pitch = orientation[1];
-                float roll = orientation[2];
+                SensorManager.getOrientation(Rotation, orientation);
+
+                float yaw = Math.round(Math.toDegrees(orientation[0]));
+                float pitch = Math.round(Math.toDegrees(orientation[1]));
+                float roll = Math.round(Math.toDegrees(orientation[2]));
+
+                // set text color
+                text.setTextColor(Color.BLACK);
+                text2.setTextColor(Color.BLACK);
+                text3.setTextColor(Color.BLACK);
+
+                /*text.setText("Yaw : " +yaw);
+                text2.setText("Pitch : " +pitch);
+                text3.setText("Roll : " +roll);*/
+
+                if(currTime - timestamp >= 300) {
+                    timestamp = currTime;
+                    if(oldRoll == 0 && oldPitch == 0 && oldYaw == 0) {
+                        oldPitch = pitch;
+                        oldRoll = roll;
+                        oldYaw = yaw;
+                    } else {
+                        if(roll - oldRoll >= 30 && canGo) {
+                            text.setText("NO");
+                            // execute code here for NO
+                            timestampValidate = currTime;
+                            canGo = false;
+                        } else if(roll - oldRoll <= -30 && canGo) {
+                            text.setText("YES");
+                            // execute code here for YES
+                            timestampValidate = currTime;
+                            canGo = false;
+                        } else if(!canGo) {
+
+                        }
+                    }
+                    oldPitch = pitch;
+                    oldRoll = roll;
+                    oldYaw = yaw;
+                }
+                if(currTime - timestampValidate >= 1500 && !canGo) {
+                    text.setText("You can re test...");
+                    canGo = true;
+                    timestampValidate = currTime;
+                }
             }
         }
     }

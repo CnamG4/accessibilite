@@ -26,7 +26,7 @@ import java.util.Locale;
 import java.util.Random;
 
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener {
+public class MainActivity extends ActionBarActivity implements GestureCallbackInterface {
 
     private SensorManager senSensorManager;
     private Sensor senAccelerometer;
@@ -40,6 +40,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private float oldRoll;
     private float oldPitch;
 
+    private AccessGestureRecognizer recognizer;
+
     private boolean canGo;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -48,7 +50,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        timestamp = System.currentTimeMillis();
+        /*timestamp = System.currentTimeMillis();
         timestampValidate = System.currentTimeMillis();
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -60,17 +62,35 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         oldYaw = 0;
         oldPitch = 0;
         oldRoll = 0;
-        canGo = true;
+        canGo = true;*/
+
+        recognizer = new AccessGestureRecognizer((SensorManager) getSystemService(Context.SENSOR_SERVICE));
+        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_YES_NO, (long) 350, this);
+        try {
+            recognizer.startGestureRecognizer();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
     protected void onPause() {
         super.onPause();
-        senSensorManager.unregisterListener(this);
+        //senSensorManager.unregisterListener(this);
+        try {
+            recognizer.stopGestureRecognizer();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
     protected void onResume() {
         super.onResume();
-        senSensorManager.registerListener(this, this.senAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        try {
+            recognizer.startGestureRecognizer();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        //senSensorManager.registerListener(this, this.senAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
 
@@ -96,58 +116,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         return super.onOptionsItemSelected(item);
     }
 
-    /*public void onSensorChanged(SensorEvent event) {
-        Sensor mySensor = event.sensor;
-        // This timestep's delta rotation to be multiplied by the current rotation
-        // after computing it from the gyro sample data.
-        if (timestamp != 0) {
-            currTime = System.currentTimeMillis();
-            long dT = currTime - timestamp;
-            if(dT >= 400) {
-                timestamp = currTime;
-                float test[];
-                float mdr[];
-                senSensorManager.getOrientation(mdr, test);
-                System.out.println(test);
-                float axisX = event.values[0];
-                float axisY = event.values[1];
-                float axisZ = event.values[2];
-                TextView text = (TextView) findViewById(R.id.X);
-                TextView text2 = (TextView) findViewById(R.id.Y);
-                TextView text3 = (TextView) findViewById(R.id.Z);
-
-                float myAngleXY = (float) (Math.atan2(axisX, axisY)/(Math.PI/180));
-                float myAngleXZ = (float) (Math.atan2(axisX, axisZ)/(Math.PI/180));
-                float myAngleYZ = (float) (Math.atan2(axisY, axisZ)/(Math.PI/180));
-
-                text.setTextColor(Color.RED);
-                text2.setTextColor(Color.RED);
-                text3.setTextColor(Color.RED);
-                text.setText("X : " + axisX +"\nY : " + axisY + "\nZ : " + axisZ + "\nAngleXY : " + myAngleXY);
-                text2.setText("AngleXZ : " + myAngleXZ);
-                text3.setText("AngleYZ : " + myAngleYZ);
-                if(Math.abs(myAngleXY - angleXY) >= 30) {
-                    text.setText("NICE");
-                    angleXY = myAngleXY;
-                } else {
-                    angleXY = myAngleXY;
-                }
-            }
-        }
-        else {
-            float axisX = event.values[0];
-            float axisY = event.values[1];
-            float axisZ = event.values[2];
-
-            angleXY = (float) (Math.atan2(axisX, axisY)/(Math.PI/180));
-            angleXZ = (float) (Math.atan2(axisX, axisZ)/(Math.PI/180));
-            angleYZ = (float) (Math.atan2(axisY, axisZ)/(Math.PI/180));
-            timestamp = System.currentTimeMillis();
-        }
-    }*/
-
-    float[] mGravity;
+    /*float[] mGravity;
     float[] mGeomagnetic;
+
     public void onSensorChanged(SensorEvent event) {
 
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
@@ -186,28 +157,24 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 text2.setTextColor(Color.BLACK);
                 text3.setTextColor(Color.BLACK);
 
-                /*text.setText("Yaw : " +yaw);
-                text2.setText("Pitch : " +pitch);
-                text3.setText("Roll : " +roll);*/
-
-                if(currTime - timestamp >= 300) {
+                if (currTime - timestamp >= 300) {
                     timestamp = currTime;
-                    if(oldRoll == 0 && oldPitch == 0 && oldYaw == 0) {
+                    if (oldRoll == 0 && oldPitch == 0 && oldYaw == 0) {
                         oldPitch = pitch;
                         oldRoll = roll;
                         oldYaw = yaw;
                     } else {
-                        if(roll - oldRoll >= 30 && canGo) {
+                        if (roll - oldRoll >= 30 && canGo) {
                             text.setText("NO");
                             // execute code here for NO
                             timestampValidate = currTime;
                             canGo = false;
-                        } else if(roll - oldRoll <= -30 && canGo) {
+                        } else if (roll - oldRoll <= -30 && canGo) {
                             text.setText("YES");
                             // execute code here for YES
                             timestampValidate = currTime;
                             canGo = false;
-                        } else if(!canGo) {
+                        } else if (!canGo) {
 
                         }
                     }
@@ -215,17 +182,41 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                     oldRoll = roll;
                     oldYaw = yaw;
                 }
-                if(currTime - timestampValidate >= 1500 && !canGo) {
+                if (currTime - timestampValidate >= 1500 && !canGo) {
                     text.setText("You can re test...");
                     canGo = true;
                     timestampValidate = currTime;
                 }
             }
         }
+    }*/
+
+    /*@Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }*/
+
+    @Override
+    public void didReceiveYesNoChange(int status) {
+        if (status == 0) return;
+        TextView text = (TextView) findViewById(R.id.X);
+        text.setTextColor(Color.BLACK);
+        if (status > 0) {
+            text.setText("Nope");
+            // Case of NO
+        } else if (status < 0) {
+            text.setText("Yes");
+            // Case of YES
+        }
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void didReceiveBackChange(int status) {
+        if (status == 0) return;
+    }
 
+    @Override
+    public void didReceiveForwardChange(int status) {
+        if (status == 0) return;
     }
 }

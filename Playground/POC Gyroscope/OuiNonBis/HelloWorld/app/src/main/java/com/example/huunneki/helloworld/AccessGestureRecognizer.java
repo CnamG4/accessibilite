@@ -6,6 +6,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -32,11 +33,30 @@ public class AccessGestureRecognizer implements SensorEventListener {
     private List<Float> oldYawList;
     private List<Float> oldPitchList;
     private List<Float> oldRollList;
+    private List<Boolean> firstMeasureList;
+
+    // the object that is waiting for a validation
+    private GestureCallbackInterface waitingObject = null;
+    // the method of the object that needs to be called
+    private GestureMethod waitingMethod = null;
+
+    private boolean didValidate = false;
+
+    private long prevalidationTime = 1000;
+
+
+    private static enum GestureMethod {
+        BACK_CHANGE,
+        FORWARD_CHANGE,
+        YES_NO_CHANGE
+    }
+
 
     public static enum Gesture {
         GESTURE_YES_NO,
         GESTURE_BACK,
-        GESTURE_FORWARD
+        GESTURE_FORWARD,
+        GESTURE_VALIDATION
     }
 
     public AccessGestureRecognizer(SensorManager manager) {
@@ -57,6 +77,7 @@ public class AccessGestureRecognizer implements SensorEventListener {
         oldPitchList = new ArrayList<Float>();
         oldRollList = new ArrayList<Float>();
         oldYawList = new ArrayList<Float>();
+        firstMeasureList = new ArrayList<Boolean>();
      }
 
     /* This method adds a Gesture to the Gesture Recognizer
@@ -74,6 +95,7 @@ public class AccessGestureRecognizer implements SensorEventListener {
             oldPitchList.add(new Float(0));
             oldRollList.add(new Float(0));
             oldYawList.add(new Float(0));
+            firstMeasureList.add(new Boolean(true));
             effective = true;
         }
         return  effective;
@@ -95,6 +117,7 @@ public class AccessGestureRecognizer implements SensorEventListener {
             oldPitchList.remove(index);
             oldRollList.remove(index);
             oldYawList.remove(index);
+            firstMeasureList.remove(index);
             effective = true;
         }
         return effective;
@@ -159,6 +182,7 @@ public class AccessGestureRecognizer implements SensorEventListener {
         Float oldYaw = oldYawList.get(index);
         Float oldPitch = oldPitchList.get(index);
         Float oldRoll = oldRollList.get(index);
+        Boolean isFirstMeasure = firstMeasureList.get(index);
 
         Long currentTime = System.currentTimeMillis();
 
@@ -184,17 +208,43 @@ public class AccessGestureRecognizer implements SensorEventListener {
                     // we initialize our lastMeasureTime
                     lastMeasureTime = System.currentTimeMillis();
                 } else if(currentTime - lastMeasureTime >= timestamp) {
-                    lastMeasureTime = currentTime;
-                    if(oldPitch == 0 && oldRoll == 0 && oldYaw == 0) {
+                    if(isFirstMeasure) {
                         oldPitch = pitch;
                         oldYaw = yaw;
                         oldRoll = roll;
+                        firstMeasureList.set(index, new Boolean(false));
+                        lastMeasureTime = currentTime;
                     } else {
-                        if(roll - oldRoll >= 30 || roll - oldRoll <= 30) {
-                            objectHandler.didReceiveYesNoChange((int) (roll - oldRoll));
+                        if(Math.abs(roll - oldRoll) >= 30) {
+                            if(waitingObject != null && (currentTime - prevalidationTime >= 1000)) {
+                                this.executeWaitingObjectMethod((int) (roll - oldRoll));
+                                didValidate = true;
+                                lastMeasureTime = currentTime;
+                            }
+                            else if(waitingObject == null) {
+                                //objectHandler.didReceiveYesNoChange((int) (roll - oldRoll));
+                                System.out.println(currentTime - lastMeasureTime);
+                                if(didValidate && (currentTime - lastMeasureTime >= 1000)) {
+                                    prevalidationTime = System.currentTimeMillis();
+                                    this.waitingObject = objectHandler;
+                                    this.waitingMethod = GestureMethod.YES_NO_CHANGE;
+                                    this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_YES_NO);
+                                    didValidate = false;
+                                    lastMeasureTime = currentTime;
+                                } else if (!didValidate) {
+                                    prevalidationTime = System.currentTimeMillis();
+                                    this.waitingObject = objectHandler;
+                                    this.waitingMethod = GestureMethod.YES_NO_CHANGE;
+                                    this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_YES_NO);
+                                    lastMeasureTime = currentTime;
+                                }
+                            }
                         } else {
-                            objectHandler.didReceiveYesNoChange(0);
+
                         }
+                        oldPitch = pitch;
+                        oldRoll = roll;
+                        oldYaw = yaw;
                     }
             }
             gravity[0] = null;
@@ -255,5 +305,21 @@ public class AccessGestureRecognizer implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    private void executeWaitingObjectMethod(int status) {
+        switch(this.waitingMethod) {
+            case BACK_CHANGE:
+                break;
+            case FORWARD_CHANGE:
+                break;
+            case YES_NO_CHANGE:
+                this.waitingObject.didReceiveYesNoChange(status);
+                break;
+            default:
+                break;
+        }
+        this.waitingMethod = null;
+        this.waitingObject = null;
     }
 }

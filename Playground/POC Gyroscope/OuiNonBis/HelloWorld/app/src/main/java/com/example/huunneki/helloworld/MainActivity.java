@@ -197,6 +197,24 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
     }*/
 
     @Override
+    public void didReceiveNotificationForGesture(AccessGestureRecognizer.Gesture g) {
+        switch(g) {
+            case GESTURE_YES_NO:
+                // implement the question "Are you sure..."
+                TextView text = (TextView) findViewById(R.id.X);
+                text.setTextColor(Color.BLACK);
+                text.setText("Are you sure you want to do YES or NO ?");
+                break;
+            case GESTURE_BACK:
+                // implement the question "Are you sure..."
+                break;
+            case GESTURE_FORWARD:
+                // implement the question "Are you sure..."
+                break;
+        }
+    }
+
+    @Override
     public void didReceiveYesNoChange(int status) {
         if (status == 0) return;
         TextView text = (TextView) findViewById(R.id.X);

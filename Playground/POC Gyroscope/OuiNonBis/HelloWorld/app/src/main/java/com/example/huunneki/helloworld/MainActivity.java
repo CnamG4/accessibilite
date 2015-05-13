@@ -53,8 +53,8 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
 
 
         recognizer = new AccessGestureRecognizer((SensorManager) getSystemService(Context.SENSOR_SERVICE));
-      //  recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_YES_NO, (long) 350, this);
-        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_BACK, (long) 350, this);
+        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_YES_NO, (long) 350, this);
+      //  recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_BACK, (long) 350, this);
         try {
             recognizer.startGestureRecognizer();
         } catch (Exception e) {
@@ -208,16 +208,15 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
 
     @Override
     public void didReceiveYesNoChange(int status) {
-        if (status == 0) return;
         TextView text = (TextView) findViewById(R.id.X);
         text.setTextColor(Color.BLACK);
-        if (status > 0) {
+        if (status == 0) {
+            text.setText("Did nothing !");
+        } else if (status < 0) {
             text.setText("Nope");
             // Case of NO
-        } else if (status < 0) {
+        } else if (status > 0) {
             text.setText("Yes");
-
-            System.out.println(text.getText());
             // Case of YES
         }
     }

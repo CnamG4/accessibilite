@@ -8,6 +8,7 @@ import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -38,6 +39,7 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
+        
 
         String txt = new String();
         TextView tv = new TextView(this);
@@ -63,6 +65,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
         mManager.unregisterListener(mSensorEventListener, mAccelerometre);
+
     }
 
     @Override

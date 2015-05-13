@@ -224,6 +224,8 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
             // Case of NO
         } else if (status < 0) {
             text.setText("Yes");
+
+            System.out.println(text.getText());
             // Case of YES
         }
     }
@@ -236,5 +238,10 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
     @Override
     public void didReceiveForwardChange(int status) {
         if (status == 0) return;
+    }
+
+    @Override
+    public void didReceiveValidation(int status) {
+
     }
 }

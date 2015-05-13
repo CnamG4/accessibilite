@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
 /**
  * Created by Huunneki on 05/05/2015.
  */
-public class AccessGestureRecognizer implements SensorEventListener {
+public class AccessGestureRecognizer implements SensorEventListener, GestureCallbackInterface {
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -41,14 +41,45 @@ public class AccessGestureRecognizer implements SensorEventListener {
     private GestureMethod waitingMethod = null;
 
     private boolean didValidate = false;
+    private boolean isValidating = false;
 
     private long prevalidationTime = 1000;
+    private int waitingStatus = 0;
 
+    private AccessGestureRecognizer validator;
+
+    @Override
+    public void didReceiveNotificationForGesture(Gesture g) {
+
+    }
+
+    @Override
+    public void didReceiveYesNoChange(int status) {
+
+    }
+
+    @Override
+    public void didReceiveBackChange(int status) {
+
+    }
+
+    @Override
+    public void didReceiveForwardChange(int status) {
+
+    }
+
+    @Override
+    public void didReceiveValidation(int status) {
+        this.executeWaitingObjectMethod(this.waitingStatus);
+        this.didValidate = true;
+        this.isValidating = false;
+    }
 
     private static enum GestureMethod {
         BACK_CHANGE,
         FORWARD_CHANGE,
-        YES_NO_CHANGE
+        YES_NO_CHANGE,
+        VALIDATION
     }
 
 
@@ -130,6 +161,8 @@ public class AccessGestureRecognizer implements SensorEventListener {
         if(gestureList.size() > 0) {
             sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
             sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
+
+            this.validator = new AccessGestureRecognizer(this.sensorManager);
         }
         else {
             Exception e = new Exception("No gesture observed. Can't start");
@@ -164,9 +197,82 @@ public class AccessGestureRecognizer implements SensorEventListener {
             case GESTURE_YES_NO:
                 this.handleYesNoGesture(g, event);
                 break;
+            case GESTURE_VALIDATION:
+                this.handleValidationGesture(g, event);
             default:
                 break;
         }
+    }
+
+    public void handleValidationGesture(Gesture g, SensorEvent event) {
+        int index = this.gestureList.indexOf(g);
+        Long timestamp = timestampList.get(index);
+        Long lastMeasureTime = lastMeasureTimeList.get(index);
+        GestureCallbackInterface objectHandler = objectHandlerList.get(index);
+        Float[] gravity = gravityList.get(index);
+        Float[] geomagnetic = geomagneticList.get(index);
+        Float oldYaw = oldYawList.get(index);
+        Float oldPitch = oldPitchList.get(index);
+        Float oldRoll = oldRollList.get(index);
+        Boolean isFirstMeasure = firstMeasureList.get(index);
+
+        Long currentTime = System.currentTimeMillis();
+
+        // the time is valid, we know check the values of the sensors
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            copyPrimitiveFloatsToObjectsFloat(gravity, event.values);
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+            copyPrimitiveFloatsToObjectsFloat(geomagnetic, event.values);
+        if(gravity.length == 9 && gravity[0] != null && geomagnetic.length == 9 && geomagnetic[0] != null) {
+
+            float Rotation[] = new float[9];
+            getValuesFromSensors(Rotation, gravity, geomagnetic);
+
+            float orientation[] = new float[3];
+
+            SensorManager.getOrientation(Rotation, orientation);
+
+            float yaw = Math.round(Math.toDegrees(orientation[0]));
+            float pitch = Math.round(Math.toDegrees(orientation[1]));
+            float roll = Math.round(Math.toDegrees(orientation[2]));
+
+            if(lastMeasureTime == 0) {
+                // we initialize our lastMeasureTime
+                lastMeasureTime = System.currentTimeMillis();
+            } else if(currentTime - lastMeasureTime >= timestamp) {
+                if(isFirstMeasure) {
+                    oldPitch = pitch;
+                    oldYaw = yaw;
+                    oldRoll = roll;
+                    firstMeasureList.set(index, new Boolean(false));
+                    lastMeasureTime = currentTime;
+                } else {
+                    if(Math.abs(roll - oldRoll) >= 30 && currentTime - lastMeasureTime >= 1000) {
+                        this.waitingObject = objectHandler;
+                        this.waitingMethod = GestureMethod.VALIDATION;
+                        try {
+                            this.stopGestureRecognizer();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        this.removeGesture(Gesture.GESTURE_VALIDATION);
+                        this.executeWaitingObjectMethod(0);
+                        return;
+                    }
+                    oldPitch = pitch;
+                    oldRoll = roll;
+                    oldYaw = yaw;
+                }
+            }
+            gravity[0] = null;
+            geomagnetic[0] = null;
+        }
+        lastMeasureTimeList.set(index, lastMeasureTime);
+        gravityList.set(index, gravity);
+        geomagneticList.set(index, geomagnetic);
+        oldYawList.set(index, oldYaw);
+        oldPitchList.set(index, oldPitch);
+        oldRollList.set(index, oldRoll);
     }
 
     /* Calculate if it is a NO or a YES.
@@ -216,29 +322,35 @@ public class AccessGestureRecognizer implements SensorEventListener {
                         lastMeasureTime = currentTime;
                     } else {
                         if(Math.abs(roll - oldRoll) >= 30) {
-                            if(waitingObject != null && (currentTime - prevalidationTime >= 1000)) {
-                                this.executeWaitingObjectMethod((int) (roll - oldRoll));
-                                didValidate = true;
-                                lastMeasureTime = currentTime;
-                            }
-                            else if(waitingObject == null) {
-                                //objectHandler.didReceiveYesNoChange((int) (roll - oldRoll));
-                                System.out.println(currentTime - lastMeasureTime);
-                                if(didValidate && (currentTime - lastMeasureTime >= 1000)) {
+                            this.waitingStatus = (int) -(roll - oldRoll);
+                            if(didValidate && (currentTime - lastMeasureTime >= 1000)) {
                                     prevalidationTime = System.currentTimeMillis();
                                     this.waitingObject = objectHandler;
                                     this.waitingMethod = GestureMethod.YES_NO_CHANGE;
                                     this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_YES_NO);
                                     didValidate = false;
                                     lastMeasureTime = currentTime;
+                                    this.isValidating = true;
+                                    this.validator.addGesture(Gesture.GESTURE_VALIDATION, (long) 350, this);
+                                    try {
+                                        this.validator.startGestureRecognizer();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 } else if (!didValidate) {
                                     prevalidationTime = System.currentTimeMillis();
                                     this.waitingObject = objectHandler;
                                     this.waitingMethod = GestureMethod.YES_NO_CHANGE;
                                     this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_YES_NO);
                                     lastMeasureTime = currentTime;
+                                    this.isValidating = true;
+                                    this.validator.addGesture(Gesture.GESTURE_VALIDATION, (long) 350, this);
+                                    try {
+                                        this.validator.startGestureRecognizer();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
                         } else {
 
                         }
@@ -297,8 +409,10 @@ public class AccessGestureRecognizer implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        for (Gesture g : this.gestureList) {
-            this.handleForGesture(g, event);
+        if(!isValidating) {
+            for (Gesture g : this.gestureList) {
+                this.handleForGesture(g, event);
+            }
         }
     }
 
@@ -316,6 +430,8 @@ public class AccessGestureRecognizer implements SensorEventListener {
             case YES_NO_CHANGE:
                 this.waitingObject.didReceiveYesNoChange(status);
                 break;
+            case VALIDATION:
+                this.waitingObject.didReceiveValidation(status);
             default:
                 break;
         }

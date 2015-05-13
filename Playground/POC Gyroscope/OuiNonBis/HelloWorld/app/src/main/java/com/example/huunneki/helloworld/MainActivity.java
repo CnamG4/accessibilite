@@ -50,22 +50,11 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*timestamp = System.currentTimeMillis();
-        timestampValidate = System.currentTimeMillis();
-        senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        magnetometer = senSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_UI);
-        senSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
-
-        oldYaw = 0;
-        oldPitch = 0;
-        oldRoll = 0;
-        canGo = true;*/
 
         recognizer = new AccessGestureRecognizer((SensorManager) getSystemService(Context.SENSOR_SERVICE));
-        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_YES_NO, (long) 350, this);
+      //  recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_YES_NO, (long) 350, this);
+        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_BACK, (long) 350, this);
         try {
             recognizer.startGestureRecognizer();
         } catch (Exception e) {
@@ -207,6 +196,9 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
                 break;
             case GESTURE_BACK:
                 // implement the question "Are you sure..."
+                TextView text2 = (TextView) findViewById(R.id.Y);
+                text2.setTextColor(Color.BLACK);
+                text2.setText("Are you sure you want to do BACK ?");
                 break;
             case GESTURE_FORWARD:
                 // implement the question "Are you sure..."
@@ -232,7 +224,17 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
 
     @Override
     public void didReceiveBackChange(int status) {
+
         if (status == 0) return;
+        TextView text = (TextView) findViewById(R.id.Y);
+        text.setTextColor(Color.BLACK);
+        if (status > 0) {
+            text.setText("BACK");
+            // Case of BACK
+        } else if (status < 0) {
+            text.setText("NO BACK");
+            // Case of NO BACK
+        }
     }
 
     @Override

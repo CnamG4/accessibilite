@@ -1,5 +1,6 @@
 package com.example.huunneki.helloworld;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -104,6 +105,7 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
         sensorManager = manager;
 
         // initialization of the two sensors
+
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
@@ -168,8 +170,8 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
      */
     public void startGestureRecognizer() throws Exception {
         if(gestureList.size() > 0) {
-            sensorManager.registerListener(this, accelerometer, 100000);
-            sensorManager.registerListener(this, magnetometer, 100000);
+            sensorManager.registerListener(this, accelerometer, 200000);
+            sensorManager.registerListener(this, magnetometer, 200000);
 
             this.validator = new AccessGestureRecognizer(this.sensorManager);
         }
@@ -245,7 +247,6 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
             float pitch = Math.round(Math.toDegrees(orientation[1]));
             float roll = Math.round(Math.toDegrees(orientation[2]));
 
-            System.out.println("roll " + roll);
 
             if (lastMeasureTime == 0) {
                 // we initialize our lastMeasureTime
@@ -259,9 +260,6 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                     lastMeasureTime = currentTime;
                 } else {
                     if (Math.abs(roll - oldRoll) >= 30 && currentTime - lastMeasureTime >= 1000) {
-                        System.out.println("roll : " + roll);
-                        System.out.println("oldRoll : " + oldRoll);
-                        System.out.println("difference : " + (roll - oldRoll));
                         this.waitingObject = objectHandler;
                         this.waitingMethod = GestureMethod.VALIDATION;
                         try {
@@ -336,34 +334,40 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                         firstMeasureList.set(index, new Boolean(false));
                         lastMeasureTime = currentTime;
                     } else {
-                        if(Math.abs(pitch - oldPitch) >= 30) {
-                            if(waitingObject != null && (currentTime - prevalidationTime >= 1000)) {
-                                int retValue;
-                                if(pitch < oldPitch){
-                                    retValue = -1;
-                                }
-                                else{
-                                    retValue = 1;
-                                }
-                                this.executeWaitingObjectMethod((int) (retValue));
-                                didValidate = true;
-                                lastMeasureTime = currentTime;
-                            }
-                            else if(waitingObject == null) {
-                                if(didValidate && (currentTime - lastMeasureTime >= 1000)) {
+                        if(Math.abs(pitch - oldPitch) >= 30 && Math.abs(yaw - oldYaw) <= 55 && Math.abs(roll - oldRoll) <= 55) {
+                            this.waitingStatus = -(int) (pitch - oldPitch);
+                            if(didValidate && (currentTime - lastMeasureTime >= 1000)) {
+                                try {
+                                    this.stopGestureRecognizer();
                                     prevalidationTime = System.currentTimeMillis();
                                     this.waitingObject = objectHandler;
                                     this.waitingMethod = GestureMethod.BACK_CHANGE;
                                     this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_BACK);
+                                    lastMeasureTime = currentTime;
                                     didValidate = false;
-                                    lastMeasureTime = currentTime;
-                                } else if (!didValidate) {
+                                    this.isValidating = true;
+                                    this.validator.addGesture(Gesture.GESTURE_VALIDATION, (long) 350, this);
+                                    this.validator.startGestureRecognizer();
+                                    firstMeasureList.set(index, new Boolean(true));
+                                    lastMeasureTime = (long) 0;
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else if (!didValidate) {
+                                try {
+                                    this.stopGestureRecognizer();
                                     prevalidationTime = System.currentTimeMillis();
                                     this.waitingObject = objectHandler;
                                     this.waitingMethod = GestureMethod.BACK_CHANGE;
                                     this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_BACK);
-                                    lastMeasureTime = currentTime;
+                                    this.isValidating = true;
+                                    this.validator.addGesture(Gesture.GESTURE_VALIDATION, (long) 350, this);
+                                    this.validator.startGestureRecognizer();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
+                                firstMeasureList.set(index, new Boolean(true));
+                                lastMeasureTime = (long) 0;
                             }
                         } else {
 
@@ -430,7 +434,7 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                         firstMeasureList.set(index, new Boolean(false));
                         lastMeasureTime = currentTime;
                     } else {
-                        if(Math.abs(roll - oldRoll) >= 30) {
+                        if(Math.abs(roll - oldRoll) >= 30 && Math.abs(yaw - oldYaw) <= 55 && Math.abs(pitch-oldPitch) <= 55) {
                             this.waitingStatus = (int) -(roll - oldRoll);
                             if(didValidate && (currentTime - lastMeasureTime >= 1000)) {
                                 try {
@@ -443,7 +447,6 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                                     didValidate = false;
                                     this.isValidating = true;
                                     this.validator.addGesture(Gesture.GESTURE_VALIDATION, (long) 350, this);
-                                    System.out.println(didValidate);
                                     this.validator.startGestureRecognizer();
                                     firstMeasureList.set(index, new Boolean(true));
                                     lastMeasureTime = (long) 0;
@@ -457,7 +460,6 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                                     this.waitingObject = objectHandler;
                                     this.waitingMethod = GestureMethod.YES_NO_CHANGE;
                                     this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_YES_NO);
-                                    lastMeasureTime = currentTime;
                                     this.isValidating = true;
                                     this.validator.addGesture(Gesture.GESTURE_VALIDATION, (long) 350, this);
                                         this.validator.startGestureRecognizer();

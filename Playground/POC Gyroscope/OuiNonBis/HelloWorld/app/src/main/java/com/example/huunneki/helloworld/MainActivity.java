@@ -53,8 +53,8 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
 
 
         recognizer = new AccessGestureRecognizer((SensorManager) getSystemService(Context.SENSOR_SERVICE));
-        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_YES_NO, (long) 350, this);
-      //  recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_BACK, (long) 350, this);
+        //recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_YES_NO, (long) 350, this);
+        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_BACK, (long) 350, this);
         try {
             recognizer.startGestureRecognizer();
         } catch (Exception e) {
@@ -224,10 +224,12 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
     @Override
     public void didReceiveBackChange(int status) {
 
-        if (status == 0) return;
         TextView text = (TextView) findViewById(R.id.Y);
         text.setTextColor(Color.BLACK);
-        if (status > 0) {
+        if (status == 0) {
+            text.setText("CANCELLED");
+        }
+        else if (status > 0) {
             text.setText("BACK");
             // Case of BACK
         } else if (status < 0) {

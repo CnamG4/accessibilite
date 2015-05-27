@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\Stylo\AndroidStudioProjects\BWYATH\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\21.0.3\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
+        <dex dex="C:\Users\Stylo\AndroidStudioProjects\BWYATH\app\build\intermediates\pre-dexed\debug\classes-2282ccef41269cfa18f8b2b0b5b0bf1f2e4a3eea.jar" />
+    </item>
+    <item
+        jar="C:\Users\Stylo\AndroidStudioProjects\BWYATH\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\libs\internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
+        <dex dex="C:\Users\Stylo\AndroidStudioProjects\BWYATH\app\build\intermediates\pre-dexed\debug\internal_impl-21.0.3-568537dcd9d02291628a1c1651d6979d8a988176.jar" />
+    </item>
+    <item
+        jar="C:\Users\Stylo\AndroidStudioProjects\BWYATH\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.3\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
+        <dex dex="C:\Users\Stylo\AndroidStudioProjects\BWYATH\app\build\intermediates\pre-dexed\debug\classes-c66d6b178ec8e6e008d4d8a5f1e579e1b85ee54a.jar" />
+    </item>
+    <item
+        jar="C:\Users\Stylo\AppData\Local\Android\sdk3\extras\android\m2repository\com\android\support\support-annotations\21.0.3\support-annotations-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
+        <dex dex="C:\Users\Stylo\AndroidStudioProjects\BWYATH\app\build\intermediates\pre-dexed\debug\support-annotations-21.0.3-b48ee1916cb7101dfdb7964e8d3b8d42e1aa4307.jar" />
+    </item>
+
+</items>

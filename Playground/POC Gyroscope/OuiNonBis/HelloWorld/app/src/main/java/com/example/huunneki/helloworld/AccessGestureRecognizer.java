@@ -47,6 +47,11 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
     private long prevalidationTime = 1000;
     private int waitingStatus = 0;
 
+    // for shake gesture
+    private float mAccel; // acceleration apart from gravity
+    private float mAccelCurrent; // current acceleration including gravity
+    private float mAccelLast; // last acceleration including gravity
+
     private AccessGestureRecognizer validator;
 
     @Override
@@ -65,7 +70,7 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
     }
 
     @Override
-    public void didReceiveForwardChange(int status) {
+    public void didReceiveShakeChange(int status) {
 
     }
 
@@ -87,7 +92,7 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
 
     private static enum GestureMethod {
         BACK_CHANGE,
-        FORWARD_CHANGE,
+        SHAKE_CHANGE,
         YES_NO_CHANGE,
         VALIDATION
     }
@@ -96,7 +101,7 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
     public static enum Gesture {
         GESTURE_YES_NO,
         GESTURE_BACK,
-        GESTURE_FORWARD,
+        GESTURE_SHAKE,
         GESTURE_VALIDATION
     }
 
@@ -202,8 +207,8 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
             case GESTURE_BACK:
                 this.handleBackGesture(g, event);
                 break;
-            case GESTURE_FORWARD:
-
+            case GESTURE_SHAKE:
+                this.handleShakeGesture(g, event);
                 break;
             case GESTURE_YES_NO:
                 this.handleYesNoGesture(g, event);
@@ -334,15 +339,128 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                         firstMeasureList.set(index, new Boolean(false));
                         lastMeasureTime = currentTime;
                     } else {
-                        if(Math.abs(pitch - oldPitch) >= 30 && Math.abs(yaw - oldYaw) <= 55 && Math.abs(roll - oldRoll) <= 55) {
-                            this.waitingStatus = -(int) (pitch - oldPitch);
-                            if(didValidate && (currentTime - lastMeasureTime >= 1000)) {
+                        if(Math.abs(pitch - oldPitch) >= 35 && Math.abs(roll - oldRoll) < 35) {
+                            if(pitch - oldPitch < 0) {
+                                this.waitingStatus = -(int) (pitch - oldPitch);
+                                if (didValidate && (currentTime - lastMeasureTime >= 1000)) {
+                                    try {
+                                        this.stopGestureRecognizer();
+                                        prevalidationTime = System.currentTimeMillis();
+                                        this.waitingObject = objectHandler;
+                                        this.waitingMethod = GestureMethod.BACK_CHANGE;
+                                        this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_BACK);
+                                        lastMeasureTime = currentTime;
+                                        didValidate = false;
+                                        this.isValidating = true;
+                                        this.validator.addGesture(Gesture.GESTURE_VALIDATION, (long) 350, this);
+                                        this.validator.startGestureRecognizer();
+                                        firstMeasureList.set(index, new Boolean(true));
+                                        lastMeasureTime = (long) 0;
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                } else if (!didValidate) {
+                                    try {
+                                        this.stopGestureRecognizer();
+                                        prevalidationTime = System.currentTimeMillis();
+                                        this.waitingObject = objectHandler;
+                                        this.waitingMethod = GestureMethod.BACK_CHANGE;
+                                        this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_BACK);
+                                        this.isValidating = true;
+                                        this.validator.addGesture(Gesture.GESTURE_VALIDATION, (long) 350, this);
+                                        this.validator.startGestureRecognizer();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    firstMeasureList.set(index, new Boolean(true));
+                                    lastMeasureTime = (long) 0;
+                                }
+                            }
+                        } else {
+
+                        }
+                        oldPitch = pitch;
+                        oldRoll = roll;
+                        oldYaw = yaw;
+                    }
+                }
+                gravity[0] = null;
+                geomagnetic[0] = null;
+            }
+        lastMeasureTimeList.set(index, lastMeasureTime);
+        gravityList.set(index, gravity);
+        geomagneticList.set(index, geomagnetic);
+        oldYawList.set(index, oldYaw);
+        oldPitchList.set(index, oldPitch);
+        oldRollList.set(index, oldRoll);
+    }
+
+
+    /* Calculate if it is a SHAKE Gesture
+     *
+     */
+    private void handleShakeGesture(Gesture g, SensorEvent event) {
+        int index = this.gestureList.indexOf(g);
+        Long timestamp = timestampList.get(index);
+        Long lastMeasureTime = lastMeasureTimeList.get(index);
+        GestureCallbackInterface objectHandler = objectHandlerList.get(index);
+        Float[] gravity = gravityList.get(index);
+        Float[] geomagnetic = geomagneticList.get(index);
+        Float oldYaw = oldYawList.get(index);
+        Float oldPitch = oldPitchList.get(index);
+        Float oldRoll = oldRollList.get(index);
+        Boolean isFirstMeasure = firstMeasureList.get(index);
+
+        Long currentTime = System.currentTimeMillis();
+
+        // the time is valid, we know check the values of the sensors
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            copyPrimitiveFloatsToObjectsFloat(gravity, event.values);
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+            copyPrimitiveFloatsToObjectsFloat(geomagnetic, event.values);
+        if(gravity.length == 9 && gravity[0] != null && geomagnetic.length == 9 && geomagnetic[0] != null) {
+
+            float Rotation[] = new float[9];
+            getValuesFromSensors(Rotation, gravity, geomagnetic);
+
+            float orientation[] = new float[3];
+
+            float x = gravity[0];
+            float y = gravity[1];
+            float z = gravity[2];
+            mAccelLast = mAccelCurrent;
+            mAccelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
+            float delta = mAccelCurrent - mAccelLast;
+            mAccel = mAccel * 0.9f + delta; // perform low-cut filter
+
+            System.out.println(mAccel);
+            SensorManager.getOrientation(Rotation, orientation);
+
+            float yaw = Math.round(Math.toDegrees(orientation[0]));
+            float pitch = Math.round(Math.toDegrees(orientation[1]));
+            float roll = Math.round(Math.toDegrees(orientation[2]));
+
+            if(lastMeasureTime == 0) {
+                // we initialize our lastMeasureTime
+                lastMeasureTime = System.currentTimeMillis();
+            } else if(currentTime - lastMeasureTime >= timestamp) {
+                if(isFirstMeasure) {
+                    oldPitch = pitch;
+                    oldYaw = yaw;
+                    oldRoll = roll;
+                    firstMeasureList.set(index, new Boolean(false));
+                    lastMeasureTime = currentTime;
+                    mAccelLast = mAccelCurrent;
+                } else {
+                    if(Math.abs(pitch - oldPitch) >= 35 && Math.abs(roll - oldRoll) >= 35 && Math.abs(yaw - oldYaw) >= 35 || Math.abs(mAccel) > 5) {
+                            this.waitingStatus = 1;
+                            if (didValidate && (currentTime - lastMeasureTime >= 1000)) {
                                 try {
                                     this.stopGestureRecognizer();
                                     prevalidationTime = System.currentTimeMillis();
                                     this.waitingObject = objectHandler;
-                                    this.waitingMethod = GestureMethod.BACK_CHANGE;
-                                    this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_BACK);
+                                    this.waitingMethod = GestureMethod.SHAKE_CHANGE;
+                                    this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_SHAKE);
                                     lastMeasureTime = currentTime;
                                     didValidate = false;
                                     this.isValidating = true;
@@ -358,8 +476,8 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                                     this.stopGestureRecognizer();
                                     prevalidationTime = System.currentTimeMillis();
                                     this.waitingObject = objectHandler;
-                                    this.waitingMethod = GestureMethod.BACK_CHANGE;
-                                    this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_BACK);
+                                    this.waitingMethod = GestureMethod.SHAKE_CHANGE;
+                                    this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_SHAKE);
                                     this.isValidating = true;
                                     this.validator.addGesture(Gesture.GESTURE_VALIDATION, (long) 350, this);
                                     this.validator.startGestureRecognizer();
@@ -369,17 +487,17 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                                 firstMeasureList.set(index, new Boolean(true));
                                 lastMeasureTime = (long) 0;
                             }
-                        } else {
+                    } else {
 
-                        }
-                        oldPitch = pitch;
-                        oldRoll = roll;
-                        oldYaw = yaw;
                     }
+                    oldPitch = pitch;
+                    oldRoll = roll;
+                    oldYaw = yaw;
                 }
-                gravity[0] = null;
-                geomagnetic[0] = null;
             }
+            gravity[0] = null;
+            geomagnetic[0] = null;
+        }
         lastMeasureTimeList.set(index, lastMeasureTime);
         gravityList.set(index, gravity);
         geomagneticList.set(index, geomagnetic);
@@ -434,7 +552,7 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                         firstMeasureList.set(index, new Boolean(false));
                         lastMeasureTime = currentTime;
                     } else {
-                        if(Math.abs(roll - oldRoll) >= 30 && Math.abs(yaw - oldYaw) <= 55 && Math.abs(pitch-oldPitch) <= 55) {
+                        if(Math.abs(roll - oldRoll) >= 40 && Math.abs(pitch-oldPitch) < 35 && Math.abs(yaw - oldYaw) < 35) {
                             this.waitingStatus = (int) -(roll - oldRoll);
                             if(didValidate && (currentTime - lastMeasureTime >= 1000)) {
                                 try {
@@ -544,7 +662,8 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
             case BACK_CHANGE:
                 this.waitingObject.didReceiveBackChange(status);
                 break;
-            case FORWARD_CHANGE:
+            case SHAKE_CHANGE:
+                this.waitingObject.didReceiveShakeChange(status);
                 break;
             case YES_NO_CHANGE:
                 this.waitingObject.didReceiveYesNoChange(status);

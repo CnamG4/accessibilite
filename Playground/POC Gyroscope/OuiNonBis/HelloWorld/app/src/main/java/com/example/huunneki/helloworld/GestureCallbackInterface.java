@@ -7,6 +7,6 @@ public interface GestureCallbackInterface {
     public void didReceiveNotificationForGesture(AccessGestureRecognizer.Gesture g);
     public void didReceiveYesNoChange(int status);
     public void didReceiveBackChange(int status);
-    public void didReceiveForwardChange(int status);
+    public void didReceiveShakeChange(int status);
     public void didReceiveValidation(int status);
 }

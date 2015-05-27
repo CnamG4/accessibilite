@@ -53,8 +53,9 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
 
 
         recognizer = new AccessGestureRecognizer((SensorManager) getSystemService(Context.SENSOR_SERVICE));
-        //recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_YES_NO, (long) 350, this);
+        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_YES_NO, (long) 350, this);
         recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_BACK, (long) 350, this);
+        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_SHAKE, (long) 350, this);
         try {
             recognizer.startGestureRecognizer();
         } catch (Exception e) {
@@ -200,7 +201,10 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
                 text2.setTextColor(Color.BLACK);
                 text2.setText("Are you sure you want to do BACK ?");
                 break;
-            case GESTURE_FORWARD:
+            case GESTURE_SHAKE:
+                TextView text3 = (TextView) findViewById(R.id.Z);
+                text3.setTextColor(Color.BLACK);
+                text3.setText("Do you want to go for the SHAKE Gesture ?");
                 // implement the question "Are you sure..."
                 break;
         }
@@ -239,8 +243,17 @@ public class MainActivity extends ActionBarActivity implements GestureCallbackIn
     }
 
     @Override
-    public void didReceiveForwardChange(int status) {
-        if (status == 0) return;
+    public void didReceiveShakeChange(int status) {
+        if (status == 0) {
+            TextView text = (TextView) findViewById(R.id.Z);
+            text.setTextColor(Color.BLACK);
+            text.setText("NO SHAKE");
+        }
+        else if(status == 1) {
+            TextView text = (TextView) findViewById(R.id.Z);
+            text.setTextColor(Color.BLACK);
+            text.setText("SHAKE SHAKE SHAKE");
+        }
     }
 
     @Override

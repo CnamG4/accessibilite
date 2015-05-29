@@ -10,6 +10,8 @@ public class Page {
 
     // Numéro de la page
     private int number;
+    // Type de page (fin de l'histoire, début de l'histoire)
+    private String type;
     // Titre de la page
     private String title;
     // Contenu de la page
@@ -29,8 +31,9 @@ public class Page {
      * @param question Question posée à l'utilisateur
      * @param choise_type Type de choix demandé à l'utilisateur
      */
-    public Page(int number, String title, String content, String question, String choise_type){
+    public Page(int number, String type, String title, String content, String question, String choise_type){
         this.setNumber(number);
+        this.setType(type);
         this.setTitle(title);
         this.setContent(content);
         this.setQuestion(question);
@@ -62,6 +65,14 @@ public class Page {
 
     public void setNumber(int number) {
         this.number = number;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getTitle() {

@@ -30,6 +30,7 @@ public class StoryGame {
     public void initHistory(){
         Page p = new Page(
                 1,
+                "begin",
                 "Page 1 - Introduction",
                 "Contenu de la page d'introduction",
                 "Quelle porte voulez-vous prendre ?",
@@ -42,6 +43,7 @@ public class StoryGame {
 
         p = new Page(
                 2,
+                "simple",
                 "Page 2 - La porte de droite",
                 "La porte de droite est en fait un cul de sac et vous retournez à la salle précédente... ",
                 "Quel porte voulez vou prendre ?",
@@ -54,6 +56,7 @@ public class StoryGame {
 
         p = new Page(
                 3,
+                "simple",
                 "Page 3 - La porte de gauche",
                 "Vous rencontrez un rat qui enquête sur la mort d'une souris sur un terrain de tennis. " +
                 "Ce dernier vous raquette votre raquette pour passer inconito.",
@@ -63,11 +66,12 @@ public class StoryGame {
         );
         p.addChoise("Je suis dans un rêve car c'est impossible",6);
         p.addChoise("Je lui donne", 4);
-        p.addChoise("je le tappe et je fais des frittes",5);
+        p.addChoise("je le tappe et je fais des frites",5);
         this.story.add(2, p);
 
         p = new Page(
                 4,
+                "simple",
                 "Page 4 - La salle mystérieuse",
                 "La fameuse salle mystère ... ",
                 "Quel potion choisissez-vous d'engloutir ?",
@@ -80,6 +84,7 @@ public class StoryGame {
 
         p = new Page(
                 5,
+                "simple",
                 "Page 5 - Le fou du roi",
                 "Vos choix sont mauvais et vous etes en echec et mathématiques. Il est temps de prendre du ragout. ",
                 "Comment trouvez-vous le ragout ?",
@@ -92,9 +97,10 @@ public class StoryGame {
 
         p = new Page(
                 6,
+                "end",
                 "Page 6 - Fin du rêve",
                 "Il était temps de reprendre le travail mon vieux Lopez. La castagne te monte à la tête et tu halucines d'étranges choix ",
-                "Comment trouvez-vous le ragout ?",
+                null,
                 null
         );
         this.story.add(5, p);
@@ -110,8 +116,8 @@ public class StoryGame {
         this.story.add(page);
     }
 
-    public void addPage(int number, String title, String content, String question, String choise_type, ArrayList<Choise> choise){
-        Page page = new Page(number,title,content,question,choise_type);
+    public void addPage(int number, String type, String title, String content, String question, String choise_type, ArrayList<Choise> choise){
+        Page page = new Page(number, type, title ,content,question,choise_type);
         for(int i = 0; i<choise.size(); i++){
             page.addChoise(choise.get(i));
         }

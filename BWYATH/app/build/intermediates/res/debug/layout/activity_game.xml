@@ -38,7 +38,7 @@
 
         <RadioButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="28dp"
             android:text="L&apos;entrée de la grotte"
             android:id="@+id/rb_choise1"
             android:layout_gravity="left|top"
@@ -46,7 +46,7 @@
 
         <RadioButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="28dp"
             android:text="Le chemin étroi"
             android:id="@+id/rb_choise2"
             android:layout_gravity="left|center_vertical"
@@ -54,7 +54,7 @@
 
         <RadioButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:text="La téléportation futile"
             android:id="@+id/rb_choise3"
             android:layout_gravity="left|bottom"

@@ -53,8 +53,12 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
             startActivity(intent);
         }
         else if (id == R.id.btn_leave) {
-            MainActivity.this.finish();
+            this.finish();
         }
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     @Override

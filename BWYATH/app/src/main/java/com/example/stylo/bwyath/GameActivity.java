@@ -51,7 +51,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         txt_title.setText(myStory.getCurrent_page().getTitle());
         txt_content.setText(myStory.getCurrent_page().getContent());
         txt_question.setText(myStory.getCurrent_page().getQuestion());
-        if(myStory.getCurrent_page().getNumber() == 6) {
+        if(myStory.getCurrent_page().getType().equals("end")) {
             rb_choise1.setVisibility(View.INVISIBLE);
             rb_choise2.setVisibility(View.INVISIBLE);
             rb_choise3.setVisibility(View.INVISIBLE);
@@ -63,7 +63,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
             rb_choise2.setText(myStory.getCurrent_page().getChoise(1).getContent());
             rb_choise3.setText(myStory.getCurrent_page().getChoise(2).getContent());
         }
-        if(myStory.getCurrent_page().getNumber() == 1){
+        if(myStory.getCurrent_page().getType().equals("begin")){
             btn_back.setVisibility(View.INVISIBLE);
         }
         else{

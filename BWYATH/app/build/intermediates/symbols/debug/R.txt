@@ -363,6 +363,7 @@ int id btn_leave 0x7f09004b
 int id btn_new_game 0x7f090049
 int id btn_options 0x7f09004a
 int id checkbox 0x7f090029
+int id choise_layout 0x7f090041
 int id collapseActionView 0x7f090017
 int id decor_content_parent 0x7f09002f
 int id default_activity_button 0x7f090024
@@ -373,7 +374,6 @@ int id edit_query 0x7f090033
 int id end 0x7f090014
 int id expand_activities_button 0x7f090022
 int id expanded_menu 0x7f090028
-int id frameLayout 0x7f090041
 int id home 0x7f090004
 int id homeAsUp 0x7f09000d
 int id icon 0x7f090026
@@ -389,9 +389,9 @@ int id normal 0x7f09000a
 int id progress_circular 0x7f090005
 int id progress_horizontal 0x7f090006
 int id radio 0x7f09002b
-int id radioButton 0x7f090043
-int id radioButton2 0x7f090044
-int id radioButton3 0x7f090045
+int id rb_choise1 0x7f090043
+int id rb_choise2 0x7f090044
+int id rb_choise3 0x7f090045
 int id search_badge 0x7f090035
 int id search_bar 0x7f090034
 int id search_button 0x7f090036
@@ -409,9 +409,9 @@ int id showTitle 0x7f090011
 int id split_action_bar 0x7f090007
 int id submit_area 0x7f09003c
 int id tabMode 0x7f09000b
-int id textView 0x7f090042
-int id textView2 0x7f090047
 int id title 0x7f090027
+int id txt_content 0x7f090047
+int id txt_question 0x7f090042
 int id txt_title 0x7f090046
 int id up 0x7f090008
 int id useLogo 0x7f090012

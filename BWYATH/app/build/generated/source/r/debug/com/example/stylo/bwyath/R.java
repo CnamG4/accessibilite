@@ -1331,6 +1331,7 @@ containing a value of this type.
         public static final int btn_new_game=0x7f090049;
         public static final int btn_options=0x7f09004a;
         public static final int checkbox=0x7f090029;
+        public static final int choise_layout=0x7f090041;
         public static final int collapseActionView=0x7f090017;
         public static final int decor_content_parent=0x7f09002f;
         public static final int default_activity_button=0x7f090024;
@@ -1341,7 +1342,6 @@ containing a value of this type.
         public static final int end=0x7f090014;
         public static final int expand_activities_button=0x7f090022;
         public static final int expanded_menu=0x7f090028;
-        public static final int frameLayout=0x7f090041;
         public static final int home=0x7f090004;
         public static final int homeAsUp=0x7f09000d;
         public static final int icon=0x7f090026;
@@ -1357,9 +1357,9 @@ containing a value of this type.
         public static final int progress_circular=0x7f090005;
         public static final int progress_horizontal=0x7f090006;
         public static final int radio=0x7f09002b;
-        public static final int radioButton=0x7f090043;
-        public static final int radioButton2=0x7f090044;
-        public static final int radioButton3=0x7f090045;
+        public static final int rb_choise1=0x7f090043;
+        public static final int rb_choise2=0x7f090044;
+        public static final int rb_choise3=0x7f090045;
         public static final int search_badge=0x7f090035;
         public static final int search_bar=0x7f090034;
         public static final int search_button=0x7f090036;
@@ -1377,9 +1377,9 @@ containing a value of this type.
         public static final int split_action_bar=0x7f090007;
         public static final int submit_area=0x7f09003c;
         public static final int tabMode=0x7f09000b;
-        public static final int textView=0x7f090042;
-        public static final int textView2=0x7f090047;
         public static final int title=0x7f090027;
+        public static final int txt_content=0x7f090047;
+        public static final int txt_question=0x7f090042;
         public static final int txt_title=0x7f090046;
         public static final int up=0x7f090008;
         public static final int useLogo=0x7f090012;

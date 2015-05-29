@@ -1,6 +1,5 @@
 package com.example.stylo.bwyath;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,7 +15,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     private ImageButton btn_home, btn_back;
 
-    private HistoryGame myHistory;
+    private StoryGame myStory;
 
     private TextView txt_title, txt_content, txt_question;
 
@@ -30,9 +29,8 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
         btn_home = (ImageButton) findViewById(R.id.btn_home);
         btn_home.setOnClickListener(this);
-
         btn_back = (ImageButton) findViewById(R.id.btn_back);
-
+        btn_back.setOnClickListener(this);
         txt_title = (TextView) findViewById(R.id.txt_title);
         txt_content = (TextView) findViewById(R.id.txt_content);
         txt_question = (TextView) findViewById(R.id.txt_question);
@@ -43,24 +41,33 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         rb_choise3 = (RadioButton) findViewById(R.id.rb_choise3);
         rb_choise3.setOnClickListener(this);
 
-        myHistory = new HistoryGame();
-        myHistory.initHistory();
+        myStory = new StoryGame();
+        myStory.initHistory();
 
         updateViewWithCurrentPage();
     }
 
     public void updateViewWithCurrentPage(){
-        txt_title.setText(myHistory.getCurrent_page().getTitle());
-        txt_content.setText(myHistory.getCurrent_page().getContent());
-        txt_question.setText(myHistory.getCurrent_page().getQuestion());
-        if(myHistory.getCurrent_page().getNumber()!=6) {
-            rb_choise1.setText(myHistory.getCurrent_page().getChoise(0).getContent());
-            rb_choise2.setText(myHistory.getCurrent_page().getChoise(1).getContent());
-            rb_choise3.setText(myHistory.getCurrent_page().getChoise(2).getContent());
-        }else{
+        txt_title.setText(myStory.getCurrent_page().getTitle());
+        txt_content.setText(myStory.getCurrent_page().getContent());
+        txt_question.setText(myStory.getCurrent_page().getQuestion());
+        if(myStory.getCurrent_page().getNumber() == 6) {
             rb_choise1.setVisibility(View.INVISIBLE);
             rb_choise2.setVisibility(View.INVISIBLE);
             rb_choise3.setVisibility(View.INVISIBLE);
+        }else{
+            rb_choise1.setVisibility(View.VISIBLE);
+            rb_choise2.setVisibility(View.VISIBLE);
+            rb_choise3.setVisibility(View.VISIBLE);
+            rb_choise1.setText(myStory.getCurrent_page().getChoise(0).getContent());
+            rb_choise2.setText(myStory.getCurrent_page().getChoise(1).getContent());
+            rb_choise3.setText(myStory.getCurrent_page().getChoise(2).getContent());
+        }
+        if(myStory.getCurrent_page().getNumber() == 1){
+            btn_back.setVisibility(View.INVISIBLE);
+        }
+        else{
+            btn_back.setVisibility(View.VISIBLE);
         }
     }
 
@@ -70,22 +77,28 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         if (id == R.id.btn_home) {
             GameActivity.this.finish();
         }
+        else if (id == R.id.btn_back) {
+            myStory.setCurrent_page(myStory.getStory().get(myStory.removeLast_page()-1));
+            updateViewWithCurrentPage();
+        }
         else if (id == R.id.rb_choise1) {
-            myHistory.setCurrent_page(myHistory.getHistory().get(myHistory.getCurrent_page().getChoise(0).getTarget()-1));
+            myStory.addLast_page(myStory.getCurrent_page().getNumber());
+            myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(0).getTarget()-1));
             rb_choise1.setChecked(false);
             updateViewWithCurrentPage();
         }
         else if (id == R.id.rb_choise2) {
-            myHistory.setCurrent_page(myHistory.getHistory().get(myHistory.getCurrent_page().getChoise(1).getTarget()-1));
+            myStory.addLast_page(myStory.getCurrent_page().getNumber());
+            myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(1).getTarget()-1));
             rb_choise2.setChecked(false);
             updateViewWithCurrentPage();
         }
         else if (id == R.id.rb_choise3) {
-            myHistory.setCurrent_page(myHistory.getHistory().get(myHistory.getCurrent_page().getChoise(2).getTarget()-1));
+            myStory.addLast_page(myStory.getCurrent_page().getNumber());
+            myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(2).getTarget()-1));
             rb_choise3.setChecked(false);
             updateViewWithCurrentPage();
         }
-
     }
 
     @Override

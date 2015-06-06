@@ -18,8 +18,6 @@ public class TTSService extends Activity{
 
     private static TextToSpeech tts;
 
-
-
     public static TextToSpeech getTTS(Activity a){
         tts = new TextToSpeech(a, new TextToSpeech.OnInitListener() {
 
@@ -31,9 +29,6 @@ public class TTSService extends Activity{
                     if(result==TextToSpeech.LANG_MISSING_DATA ||
                             result==TextToSpeech.LANG_NOT_SUPPORTED){
                         Log.e("error", "This Language is not supported");
-                    }
-                    else{
-                        Speak("Book where you are the hero");
                     }
                 }
                 else
@@ -55,9 +50,6 @@ public class TTSService extends Activity{
                             result==TextToSpeech.LANG_NOT_SUPPORTED){
                         Log.e("error", "This Language is not supported");
                     }
-                    else{
-                        Speak("Application lancée");
-                    }
                 }
                 else
                     Log.e("error", "Initilization Failed!");
@@ -70,9 +62,9 @@ public class TTSService extends Activity{
         // TODO Auto-generated method stub
         if(text==null||"".equals(text))
         {
-            text = "Content not available";
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-        }else
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+        }else {
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+        } 
     }
 }

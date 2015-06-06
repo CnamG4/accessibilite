@@ -1,5 +1,8 @@
 package com.example.stylo.bwyath;
 
+import android.content.Context;
+import android.hardware.SensorManager;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,9 +12,17 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
+
+import AccessibilityService.AccessGestureRecognizer;
+import AccessibilityService.GestureCallbackInterface;
+import AccessibilityService.TTSService;
+import AccessibilityService.VibratorService;
 
 
-public class GameActivity extends ActionBarActivity implements View.OnTouchListener, View.OnClickListener{
+
+public class GameActivity extends ActionBarActivity implements View.OnTouchListener, View.OnClickListener, GestureCallbackInterface {
 
     private ImageButton btn_home, btn_back;
 
@@ -21,11 +32,21 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     private RadioButton rb_choise1, rb_choise2, rb_choise3;
 
+    private AccessGestureRecognizer recognizer;
+
+    private TextToSpeech tts;
+
+    private VibratorService vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        recognizer = new AccessGestureRecognizer((SensorManager) getSystemService(Context.SENSOR_SERVICE));
+        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_BACK, (long) 350, this);
+        recognizer.addGesture(AccessGestureRecognizer.Gesture.GESTURE_SHAKE, (long) 350, this);
+        tts = TTSService.getTTS(this);
 
         btn_home = (ImageButton) findViewById(R.id.btn_home);
         btn_home.setOnClickListener(this);
@@ -44,7 +65,13 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         myStory = new StoryGame();
         myStory.initHistory();
 
-        updateViewWithCurrentPage();
+        try {
+            recognizer.startGestureRecognizer();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
+        this.updateViewWithCurrentPage();
     }
 
     public void updateViewWithCurrentPage(){
@@ -69,35 +96,75 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         else{
             btn_back.setVisibility(View.VISIBLE);
         }
+        this.speakPage();
+    }
+
+    public void choise1(){
+        myStory.addLast_page(myStory.getCurrent_page().getNumber());
+        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(0).getTarget()-1));
+        rb_choise1.setChecked(false);
+        this.updateViewWithCurrentPage();
+    }
+
+    public void choise2(){
+        myStory.addLast_page(myStory.getCurrent_page().getNumber());
+        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(1).getTarget()-1));
+        rb_choise2.setChecked(false);
+        this.updateViewWithCurrentPage();
+    }
+
+    public void choise3(){
+        myStory.addLast_page(myStory.getCurrent_page().getNumber());
+        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(2).getTarget()-1));
+        rb_choise3.setChecked(false);
+        this.updateViewWithCurrentPage();
+    }
+
+    public void back(){
+        TTSService.Speak("Retour à la page précédente.");
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                myStory.setCurrent_page(myStory.getStory().get(myStory.removeLast_page()-1));
+                updateViewWithCurrentPage();
+            }
+        }, 2000);
+    }
+
+    public void home(){
+        TTSService.Speak("Retour au menu.");
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                GameActivity.this.finish();
+            }
+        }, 2000);
+    }
+
+    public void speakPage(){
+        TTSService.Speak(myStory.getCurrent_page().getTitle()
+                +myStory.getCurrent_page().getContent()
+                +myStory.getCurrent_page().getQuestion()
+        );
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.btn_home) {
-            GameActivity.this.finish();
+               this.home();
         }
         else if (id == R.id.btn_back) {
-            myStory.setCurrent_page(myStory.getStory().get(myStory.removeLast_page()-1));
-            updateViewWithCurrentPage();
+            this.back();
         }
         else if (id == R.id.rb_choise1) {
-            myStory.addLast_page(myStory.getCurrent_page().getNumber());
-            myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(0).getTarget()-1));
-            rb_choise1.setChecked(false);
-            updateViewWithCurrentPage();
+            this.choise1();
         }
         else if (id == R.id.rb_choise2) {
-            myStory.addLast_page(myStory.getCurrent_page().getNumber());
-            myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(1).getTarget()-1));
-            rb_choise2.setChecked(false);
-            updateViewWithCurrentPage();
+            this.choise2();
         }
         else if (id == R.id.rb_choise3) {
-            myStory.addLast_page(myStory.getCurrent_page().getNumber());
-            myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(2).getTarget()-1));
-            rb_choise3.setChecked(false);
-            updateViewWithCurrentPage();
+            this.choise3();
         }
     }
 
@@ -126,5 +193,34 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void didReceiveNotificationForGesture(AccessGestureRecognizer.Gesture g) {
+
+    }
+
+    @Override
+    public void didReceiveYesNoChange(int status) {
+
+    }
+
+    @Override
+    public void didReceiveBackChange(int status) {
+        if(status > 0 && myStory.getCurrent_page().getNumber()>1) {
+           this. back();
+        }
+    }
+
+    @Override
+    public void didReceiveShakeChange(int status) {
+        if(status == 1) {
+            this.home();
+        }
+    }
+
+    @Override
+    public void didReceiveValidation(int status) {
+
     }
 }

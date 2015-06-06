@@ -2,37 +2,53 @@ package com.example.stylo.bwyath;
 
 /**
  * Created by Stylo on 29/05/2015.
- * Choix permettant de créer une réponse associé au numéro de page cible de cette dernière
+ * Choose to create a combined response to target a page number
  */
 public class Choise  {
 
-    // Contenu de la réponse
+    // Choise content
     private String content;
-    // Page ciblée par ce choix
+    // Choise target page number
     private int target;
 
     /**
-     * Constructeur de choix
-     * @param content Contenu de la réponse
-     * @param target Page ciblée par ce choix
+     * Choise constructor
+     * @param content choise content
+     * @param target choise target
      */
     public Choise(String content, int target){
        this.setContent(content);
        this.setTarget(target);
     }
 
+    /**
+     * Return the choise content
+     * @return content : page content
+     */
     public String getContent() {
         return content;
     }
 
+    /**
+     * Edit page content
+     * @param content : new page content
+     */
     public void setContent(String content) {
         this.content = content;
     }
 
+    /**
+     * Return the target page number
+     * @return target : taget page number
+     */
     public int getTarget() {
         return target;
     }
 
+    /**
+     * Edit the target page number
+     * @param target : new target page number
+     */
     public void setTarget(int target) {
         this.target = target;
     }

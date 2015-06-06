@@ -41,6 +41,16 @@ public class Page {
         this.choise = new ArrayList<Choise>();
     }
 
+    public Page(int i, String s, String s1, String s2, String radiobutton) {
+        this.setNumber(number);
+        this.setType("mdr");
+        this.setTitle(title);
+        this.setContent(content);
+        this.setQuestion(question);
+        this.setChoise_type(choise_type);
+        this.choise = new ArrayList<Choise>();
+    }
+
     /**
      * Add a choise in the choise list
      * @param choise choise to add

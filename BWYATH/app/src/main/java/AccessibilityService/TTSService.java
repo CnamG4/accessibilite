@@ -67,4 +67,8 @@ public class TTSService extends Activity{
             tts.speak(text, TextToSpeech.QUEUE_ADD, null);
         } 
     }
+
+    public static void Stop() {
+        tts.stop();
+    }
 }

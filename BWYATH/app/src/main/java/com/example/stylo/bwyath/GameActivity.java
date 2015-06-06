@@ -1,10 +1,14 @@
 package com.example.stylo.bwyath;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
 import android.os.Handler;
+import android.speech.tts.TextToSpeechService;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -38,6 +42,8 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     private VibratorService vibrator;
 
+    private static View theView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +68,8 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         rb_choise3 = (RadioButton) findViewById(R.id.rb_choise3);
         rb_choise3.setOnClickListener(this);
 
+        theView = (View) txt_title.getParent();
+
         myStory = new StoryGame();
         myStory.initHistory();
 
@@ -75,6 +83,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
     }
 
     public void updateViewWithCurrentPage(){
+        TTSService.Stop();
         txt_title.setText(myStory.getCurrent_page().getTitle());
         txt_content.setText(myStory.getCurrent_page().getContent());
         txt_question.setText(myStory.getCurrent_page().getQuestion());
@@ -100,6 +109,8 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
     }
 
     public void choise1(){
+        TTSService.Stop();
+        // TODO annoncer qu'on va changer + validator
         myStory.addLast_page(myStory.getCurrent_page().getNumber());
         myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(0).getTarget()-1));
         rb_choise1.setChecked(false);
@@ -107,6 +118,8 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
     }
 
     public void choise2(){
+        TTSService.Stop();
+        // TODO annoncer qu'on va changer + validator
         myStory.addLast_page(myStory.getCurrent_page().getNumber());
         myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(1).getTarget()-1));
         rb_choise2.setChecked(false);
@@ -114,6 +127,8 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
     }
 
     public void choise3(){
+        TTSService.Stop();
+        // TODO annoncer qu'on va changer + validator
         myStory.addLast_page(myStory.getCurrent_page().getNumber());
         myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(2).getTarget()-1));
         rb_choise3.setChecked(false);
@@ -121,7 +136,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
     }
 
     public void back(){
-        TTSService.Speak("Retour à la page précédente.");
+        this.announceText("Retour à la page précédente.", false);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
@@ -132,7 +147,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
     }
 
     public void home(){
-        TTSService.Speak("Retour au menu.");
+        this.announceText("Retour au menu.", false);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
@@ -142,10 +157,9 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
     }
 
     public void speakPage(){
-        TTSService.Speak(myStory.getCurrent_page().getTitle()
+        this.announceText(myStory.getCurrent_page().getTitle()
                 +myStory.getCurrent_page().getContent()
-                +myStory.getCurrent_page().getQuestion()
-        );
+                +(myStory.getCurrent_page().getQuestion() != null ? myStory.getCurrent_page().getQuestion() : ""), false);
     }
 
     @Override
@@ -197,7 +211,26 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     @Override
     public void didReceiveNotificationForGesture(AccessGestureRecognizer.Gesture g) {
-
+        switch(g) {
+            case GESTURE_BACK:
+                // demander si l'utilisateur est sûr de vouloir faire un back
+                if(myStory.getCurrent_page().getNumber()>1) {
+                    this.announceText("Êtes-vous sûr de vouloir revenir en arrière?", true);
+                }
+                else {
+                    // relancer le gesture
+                    recognizer.restartIfNeeded();
+                }
+                break;
+            case GESTURE_SHAKE:
+                //demander si l'utilisateur est sûr de vouloir faire une secousse
+                this.announceText("Êtes-vous sûr de vouloir revenir au menu principal?", true);
+                break;
+            case GESTURE_YES_NO:
+                //demander si l'utilisateur est sûr de vouloir faire un OUI / NON
+                this.announceText("Oui Non", true);
+                break;
+        }
     }
 
     @Override
@@ -207,20 +240,42 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     @Override
     public void didReceiveBackChange(int status) {
+        View view = (View)this.txt_title.getParent();
+        view.setBackgroundColor(0);
         if(status > 0 && myStory.getCurrent_page().getNumber()>1) {
-           this. back();
+           this.back();
+        }
+        else {
+            this.announceText("Retour en arrière annulé", false);
         }
     }
 
     @Override
     public void didReceiveShakeChange(int status) {
-        if(status == 1) {
+        View view = (View)this.txt_title.getParent();
+        view.setBackgroundColor(0);
+        if(status > 0) {
             this.home();
+        }
+        else {
+            this.announceText("Retour au menu principal annulé", false);
         }
     }
 
     @Override
     public void didReceiveValidation(int status) {
 
+    }
+
+    public void announceText(final String text, final boolean black) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(black)
+                    GameActivity.theView.setBackgroundColor(Color.BLACK);
+                TTSService.Stop();
+                TTSService.Speak(text);
+            }
+        });
     }
 }

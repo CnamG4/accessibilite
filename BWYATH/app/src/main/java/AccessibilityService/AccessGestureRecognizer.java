@@ -17,6 +17,8 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
     private Sensor accelerometer;
     private Sensor magnetometer;
 
+    private boolean droitier = true;
+
     // for each list for 1 index we have a gesture, the timestamp between the measures, and the function to be called
     private List<Gesture> gestureList;
     private List<Long> timestampList;
@@ -137,6 +139,14 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
         oldYawList = new ArrayList<Float>();
         firstMeasureList = new ArrayList<Boolean>();
      }
+
+    public boolean isDroitier() {
+        return droitier;
+    }
+
+    public void setDroitier(boolean d) {
+        droitier = d;
+    }
 
     /* This method adds a Gesture to the Gesture Recognizer
      * f is the frequency of between two measures.
@@ -283,7 +293,7 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                     lastMeasureTime = currentTime;
                     mAccelValidateLast = mAccelValidate;
                 } else {
-                    if (Math.abs(roll - oldRoll) >= 30 && currentTime - lastMeasureTime >= 1000) {
+                    if (Math.abs(roll - oldRoll) >= 35 && Math.abs(pitch-oldPitch) < 40 && Math.abs(yaw - oldYaw) >= 35 && currentTime - lastMeasureTime >= 1000) {
                         this.waitingObject = objectHandler;
                         this.waitingMethod = GestureMethod.VALIDATION;
                         try {
@@ -292,7 +302,9 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                             e.printStackTrace();
                         }
                         this.removeGesture(Gesture.GESTURE_VALIDATION);
-                        this.executeWaitingObjectMethod((int) -(roll - oldRoll));
+                        int value = (int) -(roll - oldRoll);
+                        value *= (droitier ? 1 : -1);
+                        this.executeWaitingObjectMethod(value);
                         return;
                     }
                     oldPitch = pitch;
@@ -479,7 +491,7 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                     lastMeasureTime = currentTime;
                     mAccelShakeLast = mAccelShake;
                 } else {
-                    if(Math.abs(pitch - oldPitch) >= 40 && Math.abs(roll - oldRoll) >= 40 && Math.abs(yaw - oldYaw) >= 40 && mAccelShake >= 1) {
+                    if(Math.abs(roll - oldRoll) >= 40 && Math.abs(yaw - oldYaw) >= 40 && mAccelShake >= 4) {
                             this.waitingStatus = 1;
                             if (didValidate && (currentTime - lastMeasureTime >= 1000)) {
                                 try {
@@ -590,6 +602,7 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
                     } else {
                         if(Math.abs(roll - oldRoll) >= 35 && Math.abs(pitch-oldPitch) < 40 && Math.abs(yaw - oldYaw) >= 35 && mAccelYN >= 1) {
                             this.waitingStatus = (int) -(roll - oldRoll);
+                            this.waitingStatus *= (droitier ? 1 : -1);
                             if(didValidate && (currentTime - lastMeasureTime >= 1000)) {
                                 try {
                                     this.stopGestureRecognizer();
@@ -711,5 +724,12 @@ public class AccessGestureRecognizer implements SensorEventListener, GestureCall
         }
         this.waitingMethod = null;
         this.waitingObject = null;
+    }
+
+    public void restartIfNeeded() {
+        if(this.isValidating) {
+            this.isValidating = false;
+        }
+        this.didValidate = true;
     }
 }

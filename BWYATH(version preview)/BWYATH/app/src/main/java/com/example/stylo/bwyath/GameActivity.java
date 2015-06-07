@@ -83,42 +83,6 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     }
 
-    public void onPause() {
-        super.onPause();
-
-        // tout arreter
-
-        //
-        // On arrête d'écouter les mouvements de l'utilisateur
-        //
-        try {
-            recognizer.stopGestureRecognizer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //
-        // On demande a la dame de ne plus parler
-        //
-        TTSService.Stop();
-    }
-
-    public void onResume() {
-        super.onResume();
-        // tout remettre en marche
-
-        //
-        // Remise en place du gesture recognizer
-        //
-        recognizer.addGesture(GestureService.Gesture.GESTURE_BACK, (long) 350, this);
-        recognizer.addGesture(GestureService.Gesture.GESTURE_SHAKE, (long) 350, this);
-        try {
-            recognizer.startGestureRecognizer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void updateViewWithCurrentPage(){
         TTSService.Stop();
         txt_title.setText(myStory.getCurrent_page().getTitle());
@@ -154,8 +118,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         myStory.addLast_page(myStory.getCurrent_page().getNumber());
         myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(0).getTarget()-1));
         rb_choise1.setChecked(false);
-        this.announceText("Êtes-vous sûr de vouloir choisir "+this.rb_choise1.getText().toString()+" ?", true);
-        this.addValidation();
+        this.updateViewWithCurrentPage();
     }
 
     public void choise2(){
@@ -164,8 +127,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         myStory.addLast_page(myStory.getCurrent_page().getNumber());
         myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(1).getTarget()-1));
         rb_choise2.setChecked(false);
-        this.announceText("Êtes-vous sûr de vouloir choisir "+this.rb_choise2.getText().toString()+" ?", true);
-        this.addValidation();
+        this.updateViewWithCurrentPage();
     }
 
     public void choise3(){
@@ -174,30 +136,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         myStory.addLast_page(myStory.getCurrent_page().getNumber());
         myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(2).getTarget()-1));
         rb_choise3.setChecked(false);
-        this.announceText("Êtes-vous sûr de vouloir choisir "+this.rb_choise3.getText().toString()+" ?", true);
-        this.addValidation();
-    }
-
-    public void addValidation() {
-        recognizer.removeGesture(GestureService.Gesture.GESTURE_BACK);
-        recognizer.removeGesture(GestureService.Gesture.GESTURE_SHAKE);
-        recognizer.addGesture(GestureService.Gesture.GESTURE_VALIDATION, (long) 350, this);
-        try {
-            recognizer.startGestureRecognizer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void removeValidation() {
-        recognizer.addGesture(GestureService.Gesture.GESTURE_BACK, (long) 350, this);
-        recognizer.addGesture(GestureService.Gesture.GESTURE_SHAKE, (long) 350, this);
-        recognizer.removeGesture(GestureService.Gesture.GESTURE_VALIDATION);
-        try {
-            recognizer.startGestureRecognizer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.updateViewWithCurrentPage();
     }
 
     public void back(){
@@ -359,14 +298,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     @Override
     public void didReceiveValidation(int status) {
-        View view = (View)this.txt_title.getParent();
-        view.setBackgroundResource(R.drawable.background);
-        if(status < 0) {
-            // annulation
-        } else {
-            this.updateViewWithCurrentPage();
-            this.removeValidation();
-        }
+
     }
 
     public void announceText(final String text, final boolean black) {

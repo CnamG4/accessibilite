@@ -293,7 +293,7 @@ public class GestureService implements SensorEventListener, GestureListener {
                     lastMeasureTime = currentTime;
                     mAccelValidateLast = mAccelValidate;
                 } else {
-                    if (Math.abs(roll - oldRoll) >= 35 && Math.abs(pitch-oldPitch) < 40 && mAccelValidate >= 1) {
+                    if (Math.abs(roll - oldRoll) >= 35 && Math.abs(pitch-oldPitch) < 40 && Math.abs(yaw - oldYaw) >= 35 && currentTime - lastMeasureTime >= 1000) {
                         this.waitingObject = objectHandler;
                         this.waitingMethod = GestureMethod.VALIDATION;
                         try {
@@ -491,7 +491,7 @@ public class GestureService implements SensorEventListener, GestureListener {
                     lastMeasureTime = currentTime;
                     mAccelShakeLast = mAccelShake;
                 } else {
-                    if(Math.abs(roll - oldRoll) >= 40 && Math.abs(yaw - oldYaw) >= 40 && Math.abs(pitch - oldPitch) >= 15 && mAccelShake >= 4) {
+                    if(Math.abs(roll - oldRoll) >= 40 && Math.abs(yaw - oldYaw) >= 40 && mAccelShake >= 4) {
                         this.waitingStatus = 1;
                         if (didValidate && (currentTime - lastMeasureTime >= 1000)) {
                             try {
@@ -729,7 +729,6 @@ public class GestureService implements SensorEventListener, GestureListener {
     public void restartIfNeeded() {
         if(this.isValidating) {
             this.isValidating = false;
-            this.removeGesture(Gesture.GESTURE_VALIDATION);
         }
         this.didValidate = true;
     }

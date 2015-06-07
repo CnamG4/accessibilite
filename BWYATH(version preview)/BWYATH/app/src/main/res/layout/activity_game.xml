@@ -1,0 +1,99 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@drawable/background"
+    tools:context="com.example.stylo.bwyath.GameActivity">
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_home"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@null"
+        android:src="@drawable/homeicon" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_back"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@null"
+        android:src="@drawable/backicon" />
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_toRightOf="@+id/btn_back"
+        android:layout_marginLeft="15dp"
+        android:layout_toEndOf="@+id/btn_back"
+        android:id="@+id/choise_layout"
+        android:layout_below="@+id/txt_question">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:id="@+id/rb_choise1"
+            android:layout_gravity="left|top"
+            android:checked="false" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:id="@+id/rb_choise2"
+            android:layout_gravity="left|center_vertical"
+            android:checked="false" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:id="@+id/rb_choise3"
+            android:layout_gravity="left|bottom"
+            android:checked="false" />
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/txt_title"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/choise_layout"
+        android:layout_alignEnd="@+id/choise_layout"
+        android:layout_alignBottom="@+id/btn_home"
+        android:layout_toRightOf="@+id/btn_back"
+        android:layout_toEndOf="@+id/btn_back"
+        android:text="chargement ..." />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/txt_question"
+        android:layout_above="@+id/btn_back"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/txt_content"
+        android:layout_below="@+id/btn_home"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/txt_question"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_alignRight="@+id/txt_title"
+        android:layout_alignEnd="@+id/txt_title" />
+
+</RelativeLayout>

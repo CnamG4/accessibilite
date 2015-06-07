@@ -56,8 +56,6 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
         btn_options.setOnClickListener(this);
         btn_leave = (ImageButton) findViewById(R.id.btn_leave);
         btn_leave.setOnClickListener(this);
-
-        tts = TTSService.getTTS(this);
         vibrator = new VibratorService(this);
     }
 

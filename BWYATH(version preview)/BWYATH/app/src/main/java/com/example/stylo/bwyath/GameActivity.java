@@ -52,7 +52,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         } catch (Exception e) {
             System.out.println(e.toString());
         }
-        tts = TTSService.getTTS(this);
+        tts = TTSService.getTTS();
         vibrator = new VibratorService(this);
 
         btn_home = (ImageButton) findViewById(R.id.btn_home);

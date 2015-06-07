@@ -18,14 +18,6 @@ public class TTSService extends Activity{
 
     private static TextToSpeech tts;
 
-    public static TextToSpeech getTTS() {
-        if(tts != null) {
-            return tts;
-        }
-        else
-            return null;
-    }
-
     public static TextToSpeech getTTS(Activity a){
         tts = new TextToSpeech(a, new OnInitListener() {
 

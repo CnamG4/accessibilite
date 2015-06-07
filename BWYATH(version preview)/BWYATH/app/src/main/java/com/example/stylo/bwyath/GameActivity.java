@@ -38,6 +38,14 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     private static View theView;
 
+    private enum Method {
+        BACK,
+        HOME,
+        UPDATE
+    }
+
+    private Method method;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,31 +107,31 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     public void choise1(){
         TTSService.Stop();
-        vibrator.validate();
         myStory.addLast_page(myStory.getCurrent_page().getNumber());
-        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(0).getTarget()-1));
+        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(0).getTarget() - 1));
         rb_choise1.setChecked(false);
-        this.announceText("Êtes-vous sûr de vouloir choisir "+this.rb_choise1.getText().toString()+" ?", true);
+        this.announceText("Êtes-vous sûr de vouloir choisir " + this.rb_choise1.getText().toString() + " ?", true);
+        this.method = Method.UPDATE;
         this.addValidation();
     }
 
     public void choise2(){
         TTSService.Stop();
-        vibrator.validate();
         myStory.addLast_page(myStory.getCurrent_page().getNumber());
-        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(1).getTarget()-1));
+        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(1).getTarget() - 1));
         rb_choise2.setChecked(false);
-        this.announceText("Êtes-vous sûr de vouloir choisir "+this.rb_choise2.getText().toString()+" ?", true);
+        this.announceText("Êtes-vous sûr de vouloir choisir " + this.rb_choise2.getText().toString() + " ?", true);
+        this.method = Method.UPDATE;
         this.addValidation();
     }
 
     public void choise3(){
         TTSService.Stop();
-        vibrator.validate();
         myStory.addLast_page(myStory.getCurrent_page().getNumber());
-        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(2).getTarget()-1));
+        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(2).getTarget() - 1));
         rb_choise3.setChecked(false);
-        this.announceText("Êtes-vous sûr de vouloir choisir "+this.rb_choise3.getText().toString()+" ?", true);
+        this.announceText("Êtes-vous sûr de vouloir choisir " + this.rb_choise3.getText().toString() + " ?", true);
+        this.method = Method.UPDATE;
         this.addValidation();
     }
 
@@ -149,29 +157,25 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         }
     }
 
+    public void goBack() {
+        myStory.setCurrent_page(myStory.getStory().get(myStory.removeLast_page() - 1));
+        updateViewWithCurrentPage();
+        this.announceText("Retour en arrière", false);
+    }
+
     public void back(){
         TTSService.Stop();
-        if(myStory.getCurrent_page().getType().equals("begin")){
+        if(myStory.getCurrent_page().getType().equals("begin")) {
             vibrator.error();
         }
         else {
-            vibrator.validate();
-            this.announceText("Retour à la page précédente.", false);
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    myStory.setCurrent_page(myStory.getStory().get(myStory.removeLast_page() - 1));
-                    updateViewWithCurrentPage();
-                }
-            }, 2000);
-
+            this.announceText("Êtes vous sûr de vouloir retenir à la page précédente?", true);
+            this.method = Method.BACK;
+            this.addValidation();
         }
     }
 
-    public void home(){
-        TTSService.Stop();
-        vibrator.validate();
-        this.announceText("Retour au menu.", false);
+    public void goHome() {
         try {
             recognizer.stopGestureRecognizer();
         } catch (Exception e) {
@@ -180,11 +184,18 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         GameActivity.this.finish();
     }
 
+    public void home(){
+        TTSService.Stop();
+        this.announceText("Êtes vous sûr de vouloir retourner au menu principal ?", true);
+        this.method = Method.HOME;
+        this.addValidation();
+    }
+
     public void speakPage(){
         TTSService.Stop();
         TTSService.Speak(myStory.getCurrent_page().getTitle()
-                +myStory.getCurrent_page().getContent()
-                +myStory.getCurrent_page().getQuestion()
+                        + myStory.getCurrent_page().getContent()
+                        + myStory.getCurrent_page().getQuestion()
         );
     }
 
@@ -326,7 +337,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         if(status > 0 && !myStory.getCurrent_page().getType().equals("begin")) {
             this.back();
         }
-        else {
+        else if (status == 0) {
             this.announceText("Retour en arrière annulé", false);
         }
     }
@@ -349,8 +360,20 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         view.setBackgroundResource(R.drawable.background);
         if(status < 0) {
             // annulation
+            this.announceText("Navigation annulée", false);
         } else {
-            this.updateViewWithCurrentPage();
+            vibrator.validate();
+            switch(this.method) {
+                case BACK:
+                    this.goBack();
+                    break;
+                case HOME:
+                    this.goHome();
+                    break;
+                case UPDATE:
+                    this.updateViewWithCurrentPage();
+                    break;
+            }
             this.removeValidation();
         }
     }

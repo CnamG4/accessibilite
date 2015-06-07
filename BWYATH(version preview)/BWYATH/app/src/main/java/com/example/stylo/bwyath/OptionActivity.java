@@ -60,6 +60,43 @@ public class OptionActivity extends ActionBarActivity implements View.OnTouchLis
             }
         }, 1500);
     }
+    public void onPause() {
+        super.onPause();
+
+        // tout arreter
+
+        //
+        // On arrête d'écouter les mouvements de l'utilisateur
+        //
+        try {
+            recognizer.stopGestureRecognizer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //
+        // On demande a la dame de ne plus parler
+        //
+        TTSService.Stop();
+    }
+
+    public void onResume() {
+        super.onResume();
+        // tout remettre en marche
+
+        //
+        // Remise en place du gesture recognizer
+        //
+        recognizer.addGesture(GestureService.Gesture.GESTURE_BACK, (long) 350, this);
+        recognizer.addGesture(GestureService.Gesture.GESTURE_SHAKE, (long) 350, this);
+        try {
+            recognizer.startGestureRecognizer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     @Override
     public void onClick(View v) {

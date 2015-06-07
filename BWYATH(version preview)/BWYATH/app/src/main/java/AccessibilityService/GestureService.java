@@ -729,6 +729,7 @@ public class GestureService implements SensorEventListener, GestureListener {
     public void restartIfNeeded() {
         if(this.isValidating) {
             this.isValidating = false;
+            this.removeGesture(Gesture.GESTURE_VALIDATION);
         }
         this.didValidate = true;
     }

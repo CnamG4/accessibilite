@@ -32,7 +32,7 @@ public class StoryGame {
                 1,
                 "begin",
                 "Page 1 - Il était une fois.",
-                "Vous êtes le dernier héros d'un royaume en proie au désespoir. Ah non, je me trompe de livre, excusez moi. Vous êtes un paysan appelé par le roi Kevin Deux. Il vous demande d'aller rechercher le dernier artefact manquant sur sa couronne.",
+                "Vous êtes un chevalier appelé par le roi. Il vous demande d'aller rechercher le dernier artefact manquant sur sa couronne.",
                 "Par où commencer vous votre quête ? ",
                 "radiobutton"
         );
@@ -58,13 +58,13 @@ public class StoryGame {
                 3,
                 "simple",
                 "Page 3 - Le loup.",
-                "Vous avez essayé d'établir le contact avec le loup. Il vous a répondu par un grognement mais parle votre langue. Après lui avoir expliquer votre quête, il vous indique quel chemin suivre.",
+                "Vous avez essayé d'établir le contact avec le loup. Il vous a répondu par un grognement mais parle votre langue. Après lui avoir expliqué votre quête, il vous indique quel chemin suivre.",
                 "Que faites-vous ?",
                 "radiobutton"
         );
         p.addChoise("Lui faire confiance.",4);
         p.addChoise("Suivre le chemin opposé.",5);
-        p.addChoise("Lui proposer un steack.",13);
+        p.addChoise("Lui proposer un morceau de viande.",13);
         this.story.add(2, p);
 
         p = new Page(
@@ -110,7 +110,7 @@ public class StoryGame {
                 7,
                 "simple",
                 "Page 7 - Le tour du mage",
-                "Vous avez traversé la forêt avec brio. Vous arrivez maintenant au abord d'une tour relativement haute. Une lumière étrange en émane. Il semble que ce soit la demeure d'un magicien.",
+                "Vous avez traversé la forêt sans encombre. Vous arrivez maintenant au abord d'une tour relativement haute. Une lumière étrange en émane. Il semble que ce soit la demeure d'un magicien.",
                 "Que faites vous ?",
                 "radiobutton"
         );
@@ -123,7 +123,7 @@ public class StoryGame {
                 8,
                 "simple",
                 "Page 8 - Le salon du mage",
-                "Après vous être manifester, le mage vous ouvre la porte. Après avoir discuté avec lui de votre quête il vous propose de l'aide.",
+                "Après vous être manifesté, le mage vous ouvre la porte. Après avoir discuté avec lui de votre quête il vous propose de l'aide.",
                 "Que faites vous ?",
                 "radiobutton"
         );
@@ -136,13 +136,13 @@ public class StoryGame {
                 9,
                 "simple",
                 "Page 9 - Le temple de Kilroy.",
-                "Vous avez accepté l'aide du mage et vous avez bien fait. Il vient de vous téléporter devant une stèle. Sur cette dernière, un gemme semble flotter.",
+                "Vous avez accepté l'aide du mage et vous avez bien fait. Il vient de vous téléporter devant une stèle. Sur cette dernière, une gemme semble flotter.",
                 "Que faites vous ?.",
                 "radiobutton"
         );
         p.addChoise("Ramasser la gemme.",11);
         p.addChoise("Regarder attentivement.",10);
-        p.addChoise("Faire une danse de la victoire.",10);
+        p.addChoise("Fêter votre victoire.",10);
         this.story.add(8, p);
 
         p = new Page(
@@ -175,7 +175,7 @@ public class StoryGame {
                 12,
                 "end",
                 "Page 12 - MORT !",
-                "Suite à votre refus, le roi vous a fait tuer. On ne dit pas non au roi voyons…",
+                "Suite à votre refus, le roi vous a fait tuer.",
                 "",
                 ""
         );
@@ -195,7 +195,7 @@ public class StoryGame {
                 14,
                 "end",
                 "Page 14 - MORT !.",
-                "La présence que vous sentiez derrière vous sur le sentier n'était autre que les lianes d'une plante carnivore. Vous êtes actuellement en train d'être digéré.",
+                "La présence que vous sentiez derrière vous sur le sentier n'était autre que les lianes d'une plante carnivore. Vous êtes pris au piège",
                 "",
                 ""
         );
@@ -225,7 +225,7 @@ public class StoryGame {
                 17,
                 "end",
                 "Page 17 - MORT !.",
-                "On ne ri pas à la barbe d'un magicien … Il vous transforme en pâté pour son fidèle dragon.",
+                "On ne rit pas à la barbe d'un magicien … Il vous transforme en pâté pour son fidèle dragon.",
                 "",
                 ""
         );
@@ -235,7 +235,7 @@ public class StoryGame {
                 18,
                 "end",
                 "Page 18 - MORT !.",
-                "Vous venez de manger la gemme. Après avoir essayé de la macher, vous avez tenter de l'avaler d'une traite. Vous mourrez étouffé.",
+                "Vous venez de manger la gemme. Après avoir essayé de la macher, vous avez tenté de l'avaler d'une traite. Vous mourrez étouffé.",
                 "",
                 ""
         );
@@ -245,7 +245,7 @@ public class StoryGame {
                 19,
                 "end",
                 "Page 19 - Félicitations !.",
-                "Vous avez apporté au roi la gemme qu'il attendait et plus encore. Il vous couvre d'or, vous offre une aile de son château pour que vous puissez finir vos jours tranquilles… Mais l'aventure semble vous appeler… Resisterez-vous ?",
+                "Vous avez apporté au roi la gemme qu'il attendait et plus encore. Il vous couvre d'or, vous offre une aile de son château pour que vous puissez finir vos jours tranquilles…",
                 "",
                 ""
         );
@@ -255,7 +255,7 @@ public class StoryGame {
                 20,
                 "end",
                 "Page 20 - Félicitations !",
-                "Vous avez décider de garder la gemme pour vous. Ce n'est pas vraiment ce qui était prévu. Vous n'êtes vraiment pas fiable… Bon, pas grave, vous vendez la gemme, vous faites beaucoup d'argent et voilà. Comme quoi, c'est pas toujours les gentils qui gagnent.",
+                "Vous avez décider de garder la gemme pour vous. Ce n'est pas vraiment ce qui était prévu.",
                 "",
                 ""
         );
@@ -266,7 +266,7 @@ public class StoryGame {
                 21,
                 "simple",
                 "Page 21 - Le marché.",
-                "Félicitations, vous vous êtes bien équipé avant de partir à l'aventure. Votre échauffement est terminé.",
+                "Félicitations, vous vous êtes bien équipé avant de partir à l'aventure. Votre préparation est terminée.",
                 "Que faites vous ?",
                 "radiobutton"
         );

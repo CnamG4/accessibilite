@@ -16,4 +16,75 @@
         android:layout_alignParentStart="true"
         android:background="@null"
         android:src="@drawable/homeicon" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Changer la langue du TTS :"
+        android:id="@+id/textView"
+        android:layout_below="@+id/textView2"
+        android:layout_toRightOf="@+id/btn_home"
+        android:layout_toEndOf="@+id/btn_home"
+        android:layout_marginTop="128dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Latéralité manuelle :"
+        android:id="@+id/textView2"
+        android:layout_marginTop="94dp"
+        android:layout_below="@+id/btn_home"
+        android:layout_centerHorizontal="true" />
+
+    <RadioGroup
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_alignBottom="@+id/textView"
+        android:id="@+id/rg_hand">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="droitier"
+            android:id="@+id/btn_hand1"
+            android:layout_gravity="center_horizontal"
+            android:checked="false" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="gaucher"
+            android:id="@+id/btn_hand2"
+            android:layout_gravity="center_horizontal"
+            android:checked="false" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/rg_hand"
+        android:id="@+id/rg_langue">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="français"
+            android:id="@+id/btn_langue1"
+            android:layout_gravity="center_horizontal"
+            android:checked="false" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="english"
+            android:id="@+id/btn_langue2"
+            android:layout_gravity="center_horizontal"
+            android:checked="false" />
+    </RadioGroup>
+
 </RelativeLayout>

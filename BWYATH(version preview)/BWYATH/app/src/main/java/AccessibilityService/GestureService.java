@@ -92,9 +92,6 @@ public class GestureService implements SensorEventListener, GestureListener {
      * Booléen permettant de savoir s'il s'agit de la première mesure
      */
     private List<Boolean> firstMeasureList;
-    private List<Float> mAccelShakeList;
-    private List<Float> mAccelShakeCurrentList;
-    private List<Float> mAccelShakeOldList;
 
     /***
      * L'objet qui recevra un message de la part du service

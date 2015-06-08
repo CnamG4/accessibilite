@@ -31,11 +31,15 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
 
     private static View theView;
 
-    private GestureService recognizer;
+    public static GestureService recognizer;
 
     private TextToSpeech tts;
 
     private VibratorService vibrator;
+
+    public static String lateralite;
+
+    public static String language;
 
     private enum Method {
         NEWGAME,
@@ -50,8 +54,16 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        lateralite = "droitier";
+        language = "fr";
+
         recognizer = new GestureService((SensorManager) getSystemService(Context.SENSOR_SERVICE));
-        recognizer.setDroitier(true);
+        if(lateralite.equals("droitier")){
+            recognizer.setDroitier(true);
+        }
+        else{
+            recognizer.setDroitier(false);
+        }
         try {
             recognizer.startGestureRecognizer();
         } catch (Exception e) {
@@ -163,7 +175,6 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
                     options();
                 }
             }, 1500);
-            this.options();
         }
         else if (id == R.id.btn_leave) {
             TTSService.Speak("Quitter l'application.");
@@ -285,7 +296,11 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
             @Override
             public void run() {
                 if(black) {
-                    theView.setBackgroundResource(R.drawable.validation_droitier);
+                    if(MainActivity.lateralite.equals("droitier")){
+                        theView.setBackgroundResource(R.drawable.validation_droitier);
+                    } else {
+                        theView.setBackgroundResource(R.drawable.validation_gaucher);
+                    }
                 }
                 TTSService.Stop();
                 TTSService.Speak(text);

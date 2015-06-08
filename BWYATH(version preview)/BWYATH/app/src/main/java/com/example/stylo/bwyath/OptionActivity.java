@@ -161,10 +161,12 @@ public class OptionActivity extends ActionBarActivity implements View.OnTouchLis
         else if (id == R.id.btn_hand1){
             MainActivity.lateralite = "droitier";
             this.recognizer.setDroitier(true);
+            MainActivity.self.changeDroitier(false);
         }
         else if (id == R.id.btn_hand2){
             MainActivity.lateralite = "gauche";
             this.recognizer.setDroitier(false);
+            MainActivity.self.changeDroitier(false);
         }
     }
 

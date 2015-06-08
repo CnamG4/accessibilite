@@ -41,6 +41,8 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
 
     public static String language;
 
+    public static MainActivity self;
+
     private enum Method {
         NEWGAME,
         OPTIONS,
@@ -80,6 +82,8 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
         btn_leave.setOnClickListener(this);
         theView = (View) btn_new_game.getParent();
         vibrator = new VibratorService(this);
+
+        self = this;
     }
 
     @Override
@@ -306,6 +310,10 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
                 TTSService.Speak(text);
             }
         });
+    }
+
+    public void changeDroitier(boolean etat) {
+        recognizer.setDroitier(etat);
     }
 
 }

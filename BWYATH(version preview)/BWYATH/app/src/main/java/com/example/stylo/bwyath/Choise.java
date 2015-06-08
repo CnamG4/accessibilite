@@ -1,7 +1,7 @@
 package com.example.stylo.bwyath;
 
 /**
- * Created by Stylo on 29/05/2015.
+ * Created by Cnam on 29/05/2015.
  * Choose to create a combined response to target a page number
  */
 public class Choise  {

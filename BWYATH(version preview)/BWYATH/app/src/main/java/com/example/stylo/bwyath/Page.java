@@ -3,7 +3,7 @@ package com.example.stylo.bwyath;
 import java.util.ArrayList;
 
 /**
- * Created by Stylo on 29/05/2015.
+ * Created by Cnam on 29/05/2015.
  * Story book page
  */
 public class Page {

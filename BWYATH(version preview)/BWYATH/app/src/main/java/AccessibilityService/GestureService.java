@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Huunneki on 05/05/2015.
+ * Created by Cnam on 05/05/2015.
  */
 public class GestureService implements SensorEventListener, GestureListener {
 

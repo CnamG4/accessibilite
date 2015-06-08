@@ -38,6 +38,8 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     private VibratorService vibrator;
 
+    private int currentChoise;
+
     private enum Method {
         BACK,
         HOME,
@@ -107,32 +109,29 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     public void choise1(){
         TTSService.Stop();
-        myStory.addLast_page(myStory.getCurrent_page().getNumber());
-        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(0).getTarget() - 1));
         rb_choise1.setChecked(false);
         this.announceText("Êtes-vous sûr de vouloir choisir " + this.rb_choise1.getText().toString() + " ?", true);
         this.method = Method.UPDATE;
         this.addValidation();
+        currentChoise = 0;
     }
 
     public void choise2(){
         TTSService.Stop();
-        myStory.addLast_page(myStory.getCurrent_page().getNumber());
-        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(1).getTarget() - 1));
         rb_choise2.setChecked(false);
         this.announceText("Êtes-vous sûr de vouloir choisir " + this.rb_choise2.getText().toString() + " ?", true);
         this.method = Method.UPDATE;
         this.addValidation();
+        currentChoise = 1;
     }
 
     public void choise3(){
         TTSService.Stop();
-        myStory.addLast_page(myStory.getCurrent_page().getNumber());
-        myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(2).getTarget() - 1));
         rb_choise3.setChecked(false);
         this.announceText("Êtes-vous sûr de vouloir choisir " + this.rb_choise3.getText().toString() + " ?", true);
         this.method = Method.UPDATE;
         this.addValidation();
+        currentChoise = 2;
     }
 
     public void addValidation() {
@@ -169,7 +168,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
             vibrator.error();
         }
         else {
-            this.announceText("Êtes vous sûr de vouloir retenir à la page précédente?", true);
+            this.announceText("Êtes vous sûr de vouloir revenir à la page précédente?", true);
             this.method = Method.BACK;
             this.addValidation();
         }
@@ -347,7 +346,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         View view = (View)this.txt_title.getParent();
         view.setBackgroundResource(R.drawable.background);
         if(status > 0) {
-            this.home();
+            this.goHome();
         }
         else {
             this.announceText("Retour au menu principal annulé", false);
@@ -371,6 +370,8 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
                     this.goHome();
                     break;
                 case UPDATE:
+                    myStory.addLast_page(myStory.getCurrent_page().getNumber());
+                    myStory.setCurrent_page(myStory.getStory().get(myStory.getCurrent_page().getChoise(currentChoise).getTarget() - 1));
                     this.updateViewWithCurrentPage();
                     break;
             }

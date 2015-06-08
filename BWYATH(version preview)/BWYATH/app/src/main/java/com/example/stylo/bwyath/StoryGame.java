@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 /**
- * Created by Stylo on 29/05/2015.
+ * Created by Cnam on 29/05/2015.
  */
 public class StoryGame {
 

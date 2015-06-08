@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 cancelled();
+                cancelled();
             }
         });
 
@@ -58,13 +58,15 @@ public class MainActivity extends Activity {
 
     void validate(){
         vs.validate();
-        TTSService.Speak("Anthony le FDP");
+        TTSService.SetLanguage(Locale.US);
+        TTSService.Speak(TTSService.GetLanguage());
 
 
     }
     void cancelled(){
         vs.cancelled();
-        TTSService.Speak("Tavernier le Noob");
+        TTSService.SetLanguage(Locale.FRANCE);
+        TTSService.Speak(TTSService.GetLanguage());
     }
 
     @Override

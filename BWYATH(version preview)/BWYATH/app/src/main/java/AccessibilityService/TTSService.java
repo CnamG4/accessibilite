@@ -1,25 +1,24 @@
 package AccessibilityService;
 
-import android.annotation.TargetApi;
-import android.app.Service;
-import android.os.Binder;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
-import android.content.Intent;
 import android.app.Activity;
 import android.util.Log;
-
 import java.lang.String;
 import java.util.Locale;
-import java.util.Random;
 
+
+/**
+ * Created by Cnam on 17/04/2015.
+ */
 public class TTSService extends Activity{
 
     private static TextToSpeech tts;
 
+    /*
+       Methodes qui prend en parametre l'activite dans laquelle le TextToSpeech est renseigne
+       et renvoie un objet de type TextToSpeech
+    */
     public static TextToSpeech getTTS(Activity a){
         tts = new TextToSpeech(a, new OnInitListener() {
 
@@ -40,6 +39,11 @@ public class TTSService extends Activity{
         return tts;
     }
 
+    /*
+        Methodes qui prend en parametre l'activite dans laquelle le TextToSpeech est renseigne
+        ainsi qu'une variable de type Locale qui va etre le language du TextToSpeech
+        et renvoie un objet de type TextToSpeech
+     */
     public static TextToSpeech getTTS(Activity a, final Locale loc){
         tts = new TextToSpeech(a, new OnInitListener() {
 
@@ -60,6 +64,10 @@ public class TTSService extends Activity{
         return tts;
     }
 
+    /*
+        Methode qui prend en paramètre une chaine de caractere.
+        Enonce la chaine a haute vois en se servant tu TextToSpeech
+     */
     public static void Speak(String text) {
         // TODO Auto-generated method stub
         if(text==null||"".equals(text))
@@ -70,15 +78,26 @@ public class TTSService extends Activity{
         }
     }
 
+    /*
+        Coupe la parole du TextToSpeech
+     */
+
     public static void Stop() {
         tts.stop();
     }
 
+    /*
+        Renvoie une chaine de caractere représentant le language du TextToSpeech
+     */
     public static String GetLanguage(){
         return tts.getLanguage().getDisplayLanguage();
 
     }
 
+    /*
+        Methode qui prend en paramatre une variable de Type Locale.
+        Permet de changer le language du TextToSpeech
+     */
     public static void SetLanguage(Locale l){
         tts.setLanguage(l);
     }

@@ -237,6 +237,13 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        if(MainActivity.lateralite.equals("droitier")) {
+            recognizer.setDroitier(true);
+        }
+        else {
+            recognizer.setDroitier(false);
+        }
     }
 
 

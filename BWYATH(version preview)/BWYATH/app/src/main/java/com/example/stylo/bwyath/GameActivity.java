@@ -30,13 +30,13 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     private RadioButton rb_choise1, rb_choise2, rb_choise3;
 
+    private static View theView;
+
     private GestureService recognizer;
 
     private TextToSpeech tts;
 
     private VibratorService vibrator;
-
-    private static View theView;
 
     private enum Method {
         BACK,
@@ -252,7 +252,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
                 public void run() {
                     choise1();
                 }
-            }, 2000);
+            }, 1500);
         }
         else if (id == R.id.rb_choise2) {
             TTSService.Speak(myStory.getCurrent_page().getChoise(1).getContent());
@@ -261,7 +261,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
                 public void run() {
                     choise2();
                 }
-            }, 2000);
+            }, 1500);
         }
         else if (id == R.id.rb_choise3) {
             TTSService.Speak(myStory.getCurrent_page().getChoise(2).getContent());
@@ -270,7 +270,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
                 public void run() {
                     choise3();
                 }
-            }, 2000);
+            }, 1500);
         }
     }
 
@@ -383,7 +383,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
             @Override
             public void run() {
                 if(black) {
-                    theView.setBackgroundColor(Color.BLACK);
+                    theView.setBackgroundResource(R.drawable.validation_droitier);
                 }
                 TTSService.Stop();
                 TTSService.Speak(text);

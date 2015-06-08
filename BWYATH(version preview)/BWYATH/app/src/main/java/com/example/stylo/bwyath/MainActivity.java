@@ -2,6 +2,7 @@ package com.example.stylo.bwyath;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.hardware.SensorManager;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -28,11 +29,21 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
     // Bouton "Quitter"
     private ImageButton btn_leave;
 
+    private static View theView;
+
     private GestureService recognizer;
 
     private TextToSpeech tts;
 
     private VibratorService vibrator;
+
+    private enum Method {
+        NEWGAME,
+        OPTIONS,
+        LEAVE
+    }
+
+    private Method method;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +51,7 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
         setContentView(R.layout.activity_main);
 
         recognizer = new GestureService((SensorManager) getSystemService(Context.SENSOR_SERVICE));
-        recognizer.addGesture(GestureService.Gesture.GESTURE_BACK, (long) 350, this);
-        recognizer.addGesture(GestureService.Gesture.GESTURE_SHAKE, (long) 350, this);
+        recognizer.setDroitier(true);
         try {
             recognizer.startGestureRecognizer();
         } catch (Exception e) {
@@ -56,6 +66,7 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
         btn_options.setOnClickListener(this);
         btn_leave = (ImageButton) findViewById(R.id.btn_leave);
         btn_leave.setOnClickListener(this);
+        theView = (View) btn_new_game.getParent();
         vibrator = new VibratorService(this);
     }
 
@@ -64,34 +75,105 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
         return true;
     }
 
+    public void newGame(){
+        TTSService.Stop();
+        this.announceText("Êtes vous sûr de vouloir commencer une nouvelle partie ?", true);
+        this.method = Method.NEWGAME;
+        this.addValidation();
+    }
+
+    public void options(){
+        TTSService.Stop();
+        this.announceText("Êtes vous sûr de vouloir rentrer dans les options ?", true);
+        this.method = Method.OPTIONS;
+        this.addValidation();
+    }
+
+    public void leave(){
+        TTSService.Stop();
+        this.announceText("Êtes vous sûr de vouloir quitter l'application ?", true);
+        this.method = Method.LEAVE;
+        this.addValidation();
+    }
+
+    public void goNewGame(){
+        try {
+            recognizer.stopGestureRecognizer();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        Intent intent = new Intent(MainActivity.this, GameActivity.class);
+        startActivity(intent);
+    }
+
+    public void goOptions(){
+        try {
+            recognizer.stopGestureRecognizer();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        Intent intent = new Intent(MainActivity.this, OptionActivity.class);
+        startActivity(intent);
+    }
+
+    public void goLeave(){
+        try {
+            recognizer.stopGestureRecognizer();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        finish();
+    }
+
+    public void addValidation() {
+        recognizer.addGesture(GestureService.Gesture.GESTURE_VALIDATION, (long) 350, this);
+        try {
+            recognizer.startGestureRecognizer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeValidation() {
+        recognizer.removeGesture(GestureService.Gesture.GESTURE_VALIDATION);
+        try {
+            recognizer.startGestureRecognizer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.btn_new_game){
-            vibrator.validate();
-            TTSService.Speak("Nouvelle aventure.");
+            TTSService.Speak("Nouvelle partie.");
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
-                    Intent intent = new Intent(MainActivity.this, GameActivity.class);
-                    startActivity(intent);
+                    newGame();
                 }
             }, 1500);
         }
         else if (id == R.id.btn_options){
-            vibrator.validate();
             TTSService.Speak("Menu des options.");
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
-                    Intent intent = new Intent(MainActivity.this, OptionActivity.class);
-                    startActivity(intent);
+                    options();
                 }
             }, 1500);
+            this.options();
         }
         else if (id == R.id.btn_leave) {
-            vibrator.validate();
-            this.finish();
+            TTSService.Speak("Quitter l'application.");
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    leave();
+                }
+            }, 1500);
+            this.options();
         }
     }
 
@@ -122,8 +204,6 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
         //
         // Remise en place du gesture recognizer
         //
-        recognizer.addGesture(GestureService.Gesture.GESTURE_BACK, (long) 350, this);
-        recognizer.addGesture(GestureService.Gesture.GESTURE_SHAKE, (long) 350, this);
         try {
             recognizer.startGestureRecognizer();
         } catch (Exception e) {
@@ -153,7 +233,12 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
 
     @Override
     public void didReceiveNotificationForGesture(GestureService.Gesture g) {
-
+        switch(g) {
+            case GESTURE_YES_NO:
+                //demander si l'utilisateur est sûr de vouloir faire un OUI / NON
+                this.announceText("Oui Non", true);
+                break;
+        }
     }
 
     @Override
@@ -173,6 +258,39 @@ public class MainActivity extends Activity implements View.OnTouchListener, View
 
     @Override
     public void didReceiveValidation(int status) {
-
+        View view = (View)this.btn_new_game.getParent();
+        view.setBackgroundResource(R.drawable.background);
+        if(status < 0) {
+            // annulation
+            this.announceText("Navigation annulée", false);
+        } else {
+            vibrator.validate();
+            switch(this.method) {
+                case NEWGAME:
+                    this.goNewGame();
+                    break;
+                case OPTIONS:
+                    this.goOptions();
+                    break;
+                case LEAVE:
+                    this.goLeave();
+                    break;
+            }
+            this.removeValidation();
+        }
     }
+
+    public void announceText(final String text, final boolean black) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(black) {
+                    theView.setBackgroundResource(R.drawable.validation_droitier);
+                }
+                TTSService.Stop();
+                TTSService.Speak(text);
+            }
+        });
+    }
+
 }

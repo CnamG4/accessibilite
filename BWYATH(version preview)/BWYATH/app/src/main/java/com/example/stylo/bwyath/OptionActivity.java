@@ -177,7 +177,7 @@ public class OptionActivity extends ActionBarActivity implements View.OnTouchLis
         View view = (View)this.btn_home.getParent();
         view.setBackgroundResource(R.drawable.background);
         if(status > 0) {
-            this.home();
+            this.goHome();
         }
         else {
             this.announceText("Retour au menu principal annulé", false);

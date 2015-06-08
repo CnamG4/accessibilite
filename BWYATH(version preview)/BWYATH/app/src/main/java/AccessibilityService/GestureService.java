@@ -13,37 +13,114 @@ import java.util.List;
  */
 public class GestureService implements SensorEventListener, GestureListener {
 
+    /*
+     * Sensors section
+     */
+
+    /***
+     * Le manager qui nous délivrera les capteurs
+     */
     private SensorManager sensorManager;
+
+    /***
+     * L'accélérometre qui calcule les déplacements de l'appareil
+     */
     private Sensor accelerometer;
+
+    /***
+     * Le magnétometre, qui permet de calculer les angles si associé à l'accéléromètre
+     */
     private Sensor magnetometer;
 
+    /***
+     * Par défaut, l'utilisateur est droitier.
+     */
     private boolean droitier = true;
 
-    // for each list for 1 index we have a gesture, the timestamp between the measures, and the function to be called
+    /****
+     * Section listes de variables
+     * Dans chacune des listes ci dessous, pour un index donné, on accède à toutes les variables
+     * (calculs, temps, etc) liées à un type de mouvement.
+     */
+
+    /***
+     * La liste contenant tous les mouvements que le service écoutera
+     */
     private List<Gesture> gestureList;
+
+    /***
+     * Le temps entre chaque mesure
+     */
     private List<Long> timestampList;
+
+    /***
+     * La valeur numérique de la dernière mesure
+     */
     private List<Long> lastMeasureTimeList;
+
+    /***
+     * L'objet auquel nous enverrons des messages en cas d'activité, de mouvement capté
+     */
     private List<GestureListener> objectHandlerList;
+
+    /***
+     * Tableau contenant les données de gravité brutes
+     */
     private List<Float[]> gravityList;
+
+    /***
+     * Tableau contenant les données magnétiques brutes
+     */
     private List<Float[]> geomagneticList;
+
+    /***
+     * Derniere valeur d'angle "Yaw"
+     */
     private List<Float> oldYawList;
+
+    /***
+     * Derniere valeur d'angle "Pitch"
+     */
     private List<Float> oldPitchList;
+
+    /***
+     * Dernière valeur d'angle "Roll"
+     */
     private List<Float> oldRollList;
+
+    /***
+     * Booléen permettant de savoir s'il s'agit de la première mesure
+     */
     private List<Boolean> firstMeasureList;
     private List<Float> mAccelShakeList;
     private List<Float> mAccelShakeCurrentList;
     private List<Float> mAccelShakeOldList;
 
-    // the object that is waiting for a validation
+    /***
+     * L'objet qui recevra un message de la part du service
+     */
     private GestureListener waitingObject = null;
-    // the method of the object that needs to be called
+
+    /***
+     * La méthode à appeler pour le waiting object
+     */
     private GestureMethod waitingMethod = null;
 
+    /***
+     * La valeur qui sera passée en paramètre de la méthode du waiting object
+     */
+    private int waitingStatus = 0;
+
+    /***
+     * Booléen déterminant si le service vient de faire une validation
+     */
     private boolean didValidate = false;
+
+    /***
+     * Booléen déterminant si le service est en train de valider un mouvement
+     */
     private boolean isValidating = false;
 
-    private long prevalidationTime = 1000;
-    private int waitingStatus = 0;
 
     // for shake gesture
     private float mAccelShake; // acceleration apart from gravity
@@ -65,6 +142,9 @@ public class GestureService implements SensorEventListener, GestureListener {
     private float mAccelValidateCurrent; // current acceleration including gravity
     private float mAccelValidateLast; // last acceleration including gravity
 
+    /***
+     * Le service qui validera les différentes actions détectées
+     */
     private GestureService validator;
 
     @Override
@@ -103,21 +183,30 @@ public class GestureService implements SensorEventListener, GestureListener {
         }
     }
 
-    private static enum GestureMethod {
+    /***
+     * Enum qui permet de gérer les différentes méthodes à appeler de l'interface "Gesture Listener"
+     */
+    private enum GestureMethod {
         BACK_CHANGE,
         SHAKE_CHANGE,
         YES_NO_CHANGE,
         VALIDATION
     }
 
-
-    public static enum Gesture {
+    /***
+     * Enum qui permet de gérer les différents mouvements gérés par le service
+     */
+    public enum Gesture {
         GESTURE_YES_NO,
         GESTURE_BACK,
         GESTURE_SHAKE,
         GESTURE_VALIDATION
     }
 
+    /***
+     * Constructeur GestureService
+     * @param manager - Le SensorManager qui délivrera les capteurs
+     */
     public GestureService(SensorManager manager) {
         // initialization of the sensor manager
         sensorManager = manager;
@@ -140,16 +229,28 @@ public class GestureService implements SensorEventListener, GestureListener {
         firstMeasureList = new ArrayList<Boolean>();
     }
 
+    /***
+     * Renvoie la latéralité du service, gauche ou droite (faux ou vrai)
+     * @return La latéralité du service
+     */
     public boolean isDroitier() {
         return droitier;
     }
 
+    /***
+     * Paramètre la latéralité du service
+     * @param d - Vrai pour droitié, faux pour gaucher
+     */
     public void setDroitier(boolean d) {
         droitier = d;
     }
 
-    /* This method adds a Gesture to the Gesture Recognizer
-     * f is the frequency of between two measures.
+    /***
+     * Ajoute un mouvement à observer au service, si ce dernier n'est pas observé
+     * @param g - Le mouvement à observer
+     * @param f - La fréquence entre chaque saisie
+     * @param callBackObject - L'objet à qui les messages seront envoyés
+     * @return le résultat de l'ajout (vrai ou faux)
      */
     public boolean addGesture(Gesture g, Long f, GestureListener callBackObject) {
         boolean effective = false;
@@ -169,8 +270,10 @@ public class GestureService implements SensorEventListener, GestureListener {
         return  effective;
     }
 
-    /* This method removes the gesture G if it exists.
-     *
+    /***
+     * Retire le mouvement que l'on enregistre en paramètre
+     * @param g - Le mouvement à retirer
+     * @return le résultat du retrait (vrai ou faux)
      */
     public boolean removeGesture(Gesture g) {
         boolean effective = false;
@@ -191,8 +294,9 @@ public class GestureService implements SensorEventListener, GestureListener {
         return effective;
     }
 
-    /* Start the sensors
-     *
+    /***
+     * Lance l'enregistrement des mouvements de l'appareil par le service
+     * @throws Exception en cas d'absence de mouvement à observer
      */
     public void startGestureRecognizer() throws Exception {
         if(gestureList.size() > 0) {
@@ -207,9 +311,10 @@ public class GestureService implements SensorEventListener, GestureListener {
         }
     }
 
-    /* Start the sensors
-    *
-    */
+    /***
+     * Arrête l'enregistrement des mouvements par le service
+     * @throws Exception en cas d'absence de mouvement à observer
+     */
     public void stopGestureRecognizer() throws Exception {
         if(gestureList.size() > 0) {
             sensorManager.unregisterListener(this, accelerometer);
@@ -220,8 +325,10 @@ public class GestureService implements SensorEventListener, GestureListener {
         }
     }
 
-    /* Calls the specific method for each gesture
-     *
+    /***
+     * Appelle la fonction dédiée au mouvement g passé en paramètre
+     * @param g - Le mouvement observé
+     * @param event - L'événement du capteur qui a effectué la mesure
      */
     public void handleForGesture(Gesture g, SensorEvent event) {
         switch (g) {
@@ -241,7 +348,26 @@ public class GestureService implements SensorEventListener, GestureListener {
         }
     }
 
+
+    /*****
+     *
+     * La logique pour chaque handler est toujours la même, seules certaines parties changent, celles liées aux angles étudiés.
+     *
+     */
+
+
+    /***
+     * Traite la validation
+     * @param g - Le mouvement observé
+     * @param event - L'événement du capteur qui a effectué la mesure
+     */
     public void handleValidationGesture(Gesture g, SensorEvent event) {
+
+        /***
+         *
+         * Récupération des variables liées au mouvement g
+         *
+         */
         int index = this.gestureList.indexOf(g);
         Long timestamp = timestampList.get(index);
         Long lastMeasureTime = lastMeasureTimeList.get(index);
@@ -255,7 +381,7 @@ public class GestureService implements SensorEventListener, GestureListener {
 
         Long currentTime = System.currentTimeMillis();
 
-        // the time is valid, we know check the values of the sensors
+        // the time is valid, we now check the values of the sensors
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
             copyPrimitiveFloatsToObjectsFloat(gravity, event.values);
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
@@ -274,8 +400,13 @@ public class GestureService implements SensorEventListener, GestureListener {
             mAccelValidateCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
             float delta = mAccelValidateCurrent - mAccelValidateLast;
             mAccelValidate = mAccelValidate * 0.9f + delta; // perform low-cut filter
-            SensorManager.getOrientation(Rotation, orientation);
 
+            /***
+             *
+             * Récupération des 3 angles d'orientation de l'appareil
+             *
+             */
+            SensorManager.getOrientation(Rotation, orientation);
             float yaw = Math.round(Math.toDegrees(orientation[0]));
             float pitch = Math.round(Math.toDegrees(orientation[1]));
             float roll = Math.round(Math.toDegrees(orientation[2]));
@@ -293,6 +424,9 @@ public class GestureService implements SensorEventListener, GestureListener {
                     lastMeasureTime = currentTime;
                     mAccelValidateLast = mAccelValidate;
                 } else {
+                    /***
+                     * Condition d'acceptation de la validation
+                     */
                     if (Math.abs(roll - oldRoll) >= 35 && Math.abs(pitch - oldPitch) <= 40 && currentTime - lastMeasureTime >= 600) {
                         this.waitingObject = objectHandler;
                         this.waitingMethod = GestureMethod.VALIDATION;
@@ -324,10 +458,18 @@ public class GestureService implements SensorEventListener, GestureListener {
     }
 
 
-    /* Calculate if it is a BACK Gesture
-     *
+    /***
+     * Traite le mouvement de l'appareil vers l'arrière
+     * @param g - Le mouvement observé
+     * @param event - L'événement du capteur qui a effectué la mesure
      */
     private void handleBackGesture(Gesture g, SensorEvent event) {
+
+        /***
+         *
+         * Récupération des variables liées au mouvement g
+         *
+         */
         int index = this.gestureList.indexOf(g);
         Long timestamp = timestampList.get(index);
         Long lastMeasureTime = lastMeasureTimeList.get(index);
@@ -341,7 +483,7 @@ public class GestureService implements SensorEventListener, GestureListener {
 
         Long currentTime = System.currentTimeMillis();
 
-        // the time is valid, we know check the values of the sensors
+        // the time is valid, we now check the values of the sensors
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
             copyPrimitiveFloatsToObjectsFloat(gravity, event.values);
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
@@ -362,7 +504,6 @@ public class GestureService implements SensorEventListener, GestureListener {
             mAccelBack = mAccelBack * 0.9f + delta; // perform low-cut filter
 
             SensorManager.getOrientation(Rotation, orientation);
-
             float yaw = Math.round(Math.toDegrees(orientation[0]));
             float pitch = Math.round(Math.toDegrees(orientation[1]));
             float roll = Math.round(Math.toDegrees(orientation[2]));
@@ -385,7 +526,6 @@ public class GestureService implements SensorEventListener, GestureListener {
                             if (didValidate && (currentTime - lastMeasureTime >= 1000)) {
                                 try {
                                     this.stopGestureRecognizer();
-                                    prevalidationTime = System.currentTimeMillis();
                                     this.waitingObject = objectHandler;
                                     this.waitingMethod = GestureMethod.BACK_CHANGE;
                                     this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_BACK);
@@ -402,7 +542,6 @@ public class GestureService implements SensorEventListener, GestureListener {
                             } else if (!didValidate) {
                                 try {
                                     this.stopGestureRecognizer();
-                                    prevalidationTime = System.currentTimeMillis();
                                     this.waitingObject = objectHandler;
                                     this.waitingMethod = GestureMethod.BACK_CHANGE;
                                     this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_BACK);
@@ -436,10 +575,18 @@ public class GestureService implements SensorEventListener, GestureListener {
     }
 
 
-    /* Calculate if it is a SHAKE Gesture
-     *
+    /***
+     * Traite le mouvement de l'appareil lors d'une secousse
+     * @param g - Le mouvement observé
+     * @param event - L'événement du capteur qui a effectué la mesure
      */
     private void handleShakeGesture(Gesture g, SensorEvent event) {
+
+        /***
+         *
+         * Récupération des variables liées au mouvement g
+         *
+         */
         int index = this.gestureList.indexOf(g);
         Long timestamp = timestampList.get(index);
         Long lastMeasureTime = lastMeasureTimeList.get(index);
@@ -453,7 +600,7 @@ public class GestureService implements SensorEventListener, GestureListener {
 
         Long currentTime = System.currentTimeMillis();
 
-        // the time is valid, we know check the values of the sensors
+        // the time is valid, we now check the values of the sensors
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
             copyPrimitiveFloatsToObjectsFloat(gravity, event.values);
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
@@ -496,7 +643,6 @@ public class GestureService implements SensorEventListener, GestureListener {
                         if (didValidate && (currentTime - lastMeasureTime >= 1000)) {
                             try {
                                 this.stopGestureRecognizer();
-                                prevalidationTime = System.currentTimeMillis();
                                 this.waitingObject = objectHandler;
                                 this.waitingMethod = GestureMethod.SHAKE_CHANGE;
                                 this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_SHAKE);
@@ -513,7 +659,6 @@ public class GestureService implements SensorEventListener, GestureListener {
                         } else if (!didValidate) {
                             try {
                                 this.stopGestureRecognizer();
-                                prevalidationTime = System.currentTimeMillis();
                                 this.waitingObject = objectHandler;
                                 this.waitingMethod = GestureMethod.SHAKE_CHANGE;
                                 this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_SHAKE);
@@ -545,10 +690,18 @@ public class GestureService implements SensorEventListener, GestureListener {
         oldRollList.set(index, oldRoll);
     }
 
-    /* Calculate if it is a NO or a YES.
-     *
+    /***
+     * Traite le mouvement de l'appareil de gauche à droite, comme une validation
+     * @param g - Le mouvement observé
+     * @param event - L'événement du capteur qui a effectué la mesure
      */
     public void handleYesNoGesture(Gesture g, SensorEvent event) {
+
+        /***
+         *
+         * Récupération des variables liées au mouvement g
+         *
+         */
         int index = this.gestureList.indexOf(g);
         Long timestamp = timestampList.get(index);
         Long lastMeasureTime = lastMeasureTimeList.get(index);
@@ -562,7 +715,7 @@ public class GestureService implements SensorEventListener, GestureListener {
 
         Long currentTime = System.currentTimeMillis();
 
-        // the time is valid, we know check the values of the sensors
+        // the time is valid, we now check the values of the sensors
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
             copyPrimitiveFloatsToObjectsFloat(gravity, event.values);
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
@@ -606,7 +759,6 @@ public class GestureService implements SensorEventListener, GestureListener {
                         if(didValidate && (currentTime - lastMeasureTime >= 1000)) {
                             try {
                                 this.stopGestureRecognizer();
-                                prevalidationTime = System.currentTimeMillis();
                                 this.waitingObject = objectHandler;
                                 this.waitingMethod = GestureMethod.YES_NO_CHANGE;
                                 this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_YES_NO);
@@ -623,7 +775,6 @@ public class GestureService implements SensorEventListener, GestureListener {
                         } else if (!didValidate) {
                             try {
                                 this.stopGestureRecognizer();
-                                prevalidationTime = System.currentTimeMillis();
                                 this.waitingObject = objectHandler;
                                 this.waitingMethod = GestureMethod.YES_NO_CHANGE;
                                 this.waitingObject.didReceiveNotificationForGesture(Gesture.GESTURE_YES_NO);
@@ -658,6 +809,14 @@ public class GestureService implements SensorEventListener, GestureListener {
     /* Get the values from the sensors and put it in rotation.
      * rotation[0], rotation[1], rotation[2] are yaw pitch and roll values
      */
+
+    /***
+     * Récupère les valeurs des capteurs et en déduit les valeurs des angles de l'appareil
+     * @param rotation - Le tableau contenant les trois angles
+     *                 rotation[0], rotation[1], rotation[2] sont les valeurs des angles yaw pitch and roll
+     * @param gravity - Le tableau contenant les valeurs de gravité
+     * @param geomagnetic - Le tableau contenant les valeurs magnétiques
+     */
     public static void getValuesFromSensors(float[] rotation, Float[] gravity, Float[] geomagnetic) {
         float[] temp = new float[9];
         float[] primGravity = new float[9];
@@ -675,7 +834,11 @@ public class GestureService implements SensorEventListener, GestureListener {
         }
     }
 
-    // copy an array of float to an array of Float
+    /***
+     * Copie des floats primitifs vers des Floats objets
+     * @param newArray
+     * @param oldArray
+     */
     public static void copyPrimitiveFloatsToObjectsFloat(Float[] newArray, float[] oldArray) {
         int i = 0;
         for (float value : oldArray) {
@@ -683,7 +846,11 @@ public class GestureService implements SensorEventListener, GestureListener {
         }
     }
 
-    // copy an array of Float to an array of float
+    /***
+     * Copie des Floats objects vers des floats primitifs
+     * @param newArray
+     * @param oldArray
+     */
     public static void copyObjectsFloatToPrimitiveFloat(float[] newArray, Float[] oldArray) {
         int i = 0;
         for (Float value : oldArray) {
@@ -692,6 +859,11 @@ public class GestureService implements SensorEventListener, GestureListener {
         }
     }
 
+    /**
+     * Appelé à chaque mesure.
+     * Cette fonction permet d'appeler les fonctions dédiées à chaque mouvement lié au service.
+     * @param event - L'événement du capteur qui a effetué une mesure
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
         if(!isValidating) {
@@ -706,6 +878,10 @@ public class GestureService implements SensorEventListener, GestureListener {
 
     }
 
+    /***
+     * Appelle la methode de l'objet qui attend une réponse
+     * @param status - Le "sens" du mouvement, la valeur ressortie des calculs
+     */
     private void executeWaitingObjectMethod(int status) {
         switch(this.waitingMethod) {
             case BACK_CHANGE:
@@ -726,6 +902,9 @@ public class GestureService implements SensorEventListener, GestureListener {
         this.waitingObject = null;
     }
 
+    /***
+     * Relance le service s'il est bloqué (arrive dans certains cas
+     */
     public void restartIfNeeded() {
         if(this.isValidating) {
             this.isValidating = false;

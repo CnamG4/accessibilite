@@ -54,7 +54,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         setContentView(R.layout.activity_game);
 
         recognizer = new GestureService((SensorManager) getSystemService(Context.SENSOR_SERVICE));
-        recognizer.setDroitier(true); // changer droitier et gaucher
+        recognizer.setDroitier(MainActivity.lateralite); // changer droitier et gaucher
         recognizer.addGesture(GestureService.Gesture.GESTURE_BACK, (long) 350, this);
         recognizer.addGesture(GestureService.Gesture.GESTURE_SHAKE, (long) 350, this);
         try {

@@ -30,9 +30,6 @@ public class GestureService implements SensorEventListener, GestureListener {
     private List<Float> oldPitchList;
     private List<Float> oldRollList;
     private List<Boolean> firstMeasureList;
-    private List<Float> mAccelShakeList;
-    private List<Float> mAccelShakeCurrentList;
-    private List<Float> mAccelShakeOldList;
 
     // the object that is waiting for a validation
     private GestureListener waitingObject = null;
@@ -293,7 +290,7 @@ public class GestureService implements SensorEventListener, GestureListener {
                     lastMeasureTime = currentTime;
                     mAccelValidateLast = mAccelValidate;
                 } else {
-                    if (Math.abs(roll - oldRoll) >= 35 && Math.abs(pitch - oldPitch) <= 40 && currentTime - lastMeasureTime >= 600) {
+                    if (Math.abs(roll - oldRoll) >= 35 && Math.abs(pitch-oldPitch) < 40 && Math.abs(yaw - oldYaw) >= 35 && currentTime - lastMeasureTime >= 1000) {
                         this.waitingObject = objectHandler;
                         this.waitingMethod = GestureMethod.VALIDATION;
                         try {

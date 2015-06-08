@@ -12,11 +12,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import AccessibilityService.GestureListener;
 import AccessibilityService.GestureService;
 import AccessibilityService.TTSService;
 import AccessibilityService.VibratorService;
+import java.util.Locale;
 
 
 public class OptionActivity extends ActionBarActivity implements View.OnTouchListener, View.OnClickListener, GestureListener {
@@ -28,9 +31,11 @@ public class OptionActivity extends ActionBarActivity implements View.OnTouchLis
 
     private GestureService recognizer;
 
-    private TextToSpeech tts;
-
     private VibratorService vibrator;
+
+    private RadioGroup rg_hand, rg_langue;
+
+    private RadioButton btn_hand1, btn_hand2, btn_langue1, btn_langue2;
 
     private enum Method {
         HOME,
@@ -48,15 +53,43 @@ public class OptionActivity extends ActionBarActivity implements View.OnTouchLis
         btn_home.setOnClickListener(this);
         theView = (View) btn_home.getParent();
 
+        rg_hand = (RadioGroup) findViewById(R.id.rg_hand);
+        rg_langue = (RadioGroup) findViewById(R.id.rg_langue);
+        btn_hand1 = (RadioButton) findViewById(R.id.btn_hand1);
+        btn_hand1.setOnClickListener(this);
+        btn_hand2 = (RadioButton) findViewById(R.id.btn_hand2);
+        btn_hand2.setOnClickListener(this);
+        btn_langue1 = (RadioButton) findViewById(R.id.btn_langue1);
+        btn_langue1.setOnClickListener(this);
+        btn_langue2 = (RadioButton) findViewById(R.id.btn_langue2);
+        btn_langue2.setOnClickListener(this);
+
+        if(MainActivity.language.equals("fr")){
+            btn_langue1.setChecked(true);
+        } else {
+            btn_langue2.setChecked(true);
+        }
+        if(MainActivity.lateralite.equals("droitier")){
+            btn_hand1.setChecked(true);
+        } else {
+            btn_hand2.setChecked(true);
+        }
+
         recognizer = new GestureService((SensorManager) getSystemService(Context.SENSOR_SERVICE));
+        if(MainActivity.lateralite.equals("droitier")){
+            recognizer.setDroitier(true);
+        }
+        else{
+            recognizer.setDroitier(false);
+        }
         recognizer.addGesture(GestureService.Gesture.GESTURE_SHAKE, (long) 350, this);
         try {
             recognizer.startGestureRecognizer();
         } catch (Exception e) {
             System.out.println(e.toString());
         }
-        tts = TTSService.getTTS(this);
         vibrator = new VibratorService(this);
+
 
     }
 
@@ -111,13 +144,27 @@ public class OptionActivity extends ActionBarActivity implements View.OnTouchLis
         }
     }
 
-
-
     @Override
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.btn_home){
             this.home();
+        }
+        else if (id == R.id.btn_langue1){
+            MainActivity.language = "fr";
+            TTSService.SetLanguage(Locale.FRANCE);
+        }
+        else if (id == R.id.btn_langue2){
+            MainActivity.language = "en";
+            TTSService.SetLanguage(Locale.US);
+        }
+        else if (id == R.id.btn_hand1){
+            MainActivity.lateralite = "droitier";
+            this.recognizer.setDroitier(true);
+        }
+        else if (id == R.id.btn_hand2){
+            MainActivity.lateralite = "gauche";
+            this.recognizer.setDroitier(false);
         }
     }
 
@@ -177,7 +224,7 @@ public class OptionActivity extends ActionBarActivity implements View.OnTouchLis
         View view = (View)this.btn_home.getParent();
         view.setBackgroundResource(R.drawable.background);
         if(status > 0) {
-            this.goHome();
+            this.home();
         }
         else {
             this.announceText("Retour au menu principal annulé", false);
@@ -229,7 +276,11 @@ public class OptionActivity extends ActionBarActivity implements View.OnTouchLis
             @Override
             public void run() {
                 if(black) {
-                    theView.setBackgroundResource(R.drawable.validation_droitier);
+                    if(MainActivity.lateralite.equals("droitier")){
+                        theView.setBackgroundResource(R.drawable.validation_droitier);
+                    } else {
+                        theView.setBackgroundResource(R.drawable.validation_gaucher);
+                    }
                 }
                 TTSService.Stop();
                 TTSService.Speak(text);

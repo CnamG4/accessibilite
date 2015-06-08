@@ -37,7 +37,7 @@ public class StoryGame {
                 "radiobutton"
         );
         p.addChoise("Partir dans la forêt.",2);
-        p.addChoise("Explorer les latrines.",21);
+        p.addChoise("Partir au marché.",21);
         p.addChoise("Dire au roi: Euh.. Non.",12);
         this.story.add(0,p);
 
@@ -49,9 +49,9 @@ public class StoryGame {
                 "Que souhaitez vous faire ?",
                 "radiobutton"
         );
-        p.addChoise("Le contourner", 6);
-        p.addChoise("Tenter de lui parler",3);
-        p.addChoise("Lui jeter à manger",13);
+        p.addChoise("Le contourner.", 6);
+        p.addChoise("Tenter de lui parler.",3);
+        p.addChoise("Lui jeter à manger.",13);
         this.story.add(1, p);
 
         p = new Page(
@@ -62,48 +62,48 @@ public class StoryGame {
                 "Que faites-vous ?",
                 "radiobutton"
         );
-        p.addChoise("Lui faire confiance",4);
-        p.addChoise("Suivre le chemin opposé",5);
-        p.addChoise("Lui proposer un steack",13);
+        p.addChoise("Lui faire confiance.",4);
+        p.addChoise("Suivre le chemin opposé.",5);
+        p.addChoise("Lui proposer un steack.",13);
         this.story.add(2, p);
 
         p = new Page(
                 4,
                 "simple",
                 "Page 4 - Le chemin verdoyant.",
-                "Vous avez fait confiance au loup. Le chemin est dégagé, vous avancez sans difficulté vers le cœur de la forêt. La route se coupe en plusieurs chemins ",
+                "Vous avez fait confiance au loup. Le chemin est dégagé, vous avancez sans difficulté vers le cœur de la forêt. La route se coupe en plusieurs chemins.",
                 "Que faites vous ?",
                 "radiobutton"
         );
-        p.addChoise("Partir à gauche",7);
-        p.addChoise("Partir à droite",5);
-        p.addChoise("Continuer tout droit",5);
+        p.addChoise("Partir à gauche.",7);
+        p.addChoise("Partir à droite.",5);
+        p.addChoise("Continuer tout droit.",5);
         this.story.add(3,p);
 
         p = new Page(
                 5,
                 "simple",
-                "Page 5 - Le chemin sanglant",
+                "Page 5 - Le chemin sanglant.",
                 "Bien qu'il ai semblé amical, le loup reste une bête. Vous avez donc pris un autre chemin et vous voilà dans une zone bien moins amicale de la forêt.",
                 "Que faites vous ?",
                 "radiobutton"
         );
-        p.addChoise("Faire demi-tour",14);
-        p.addChoise("Continuer tout droit",7);
-        p.addChoise("Appeler à l'aide",16);
+        p.addChoise("Faire demi-tour.",14);
+        p.addChoise("Continuer tout droit.",7);
+        p.addChoise("Appeler à l'aide.",16);
         this.story.add(4, p);
 
         p = new Page(
                 6,
                 "simple",
-                "Page 6 - Le chemin verdoyant",
+                "Page 6 - Le chemin verdoyant.",
                 "Vous avez contourné l'animal. Vous arrivez sur un chemin dégagé, vert, magnifique. Vous avancez sans difficulté. La route se coupe en plusieurs chemins.",
                 "Que faites vous ?",
                 "radiobutton"
         );
-        p.addChoise("Partir à gauche",7);
-        p.addChoise("Partir à droite",5);
-        p.addChoise("Continuer tout droit",7);
+        p.addChoise("Partir à gauche.",7);
+        p.addChoise("Partir à droite.",5);
+        p.addChoise("Continuer tout droit.",7);
         this.story.add(5, p);
 
         p = new Page(
@@ -114,9 +114,9 @@ public class StoryGame {
                 "Que faites vous ?",
                 "radiobutton"
         );
-        p.addChoise("Toquer à la porte",8);
-        p.addChoise("Entrer sans frappez",15);
-        p.addChoise("Hurler du bas de la tour",8);
+        p.addChoise("Toquer à la porte.",8);
+        p.addChoise("Entrer sans frappez.",15);
+        p.addChoise("Hurler du bas de la tour.",8);
         this.story.add(6, p);
 
         p = new Page(
@@ -127,48 +127,48 @@ public class StoryGame {
                 "Que faites vous ?",
                 "radiobutton"
         );
-        p.addChoise("Accepter",9);
-        p.addChoise("Décliner gentiment et rire",17);
-        p.addChoise("Rire bruyament",17);
+        p.addChoise("Accepter.",9);
+        p.addChoise("Décliner gentiment et rire.",17);
+        p.addChoise("Rire bruyament.",17);
         this.story.add(7, p);
 
         p = new Page(
                 9,
                 "simple",
-                "Page 9 - Le temple de Kilroy",
+                "Page 9 - Le temple de Kilroy.",
                 "Vous avez accepté l'aide du mage et vous avez bien fait. Il vient de vous téléporter devant une stèle. Sur cette dernière, un gemme semble flotter.",
-                "Que faites vous ?",
+                "Que faites vous ?.",
                 "radiobutton"
         );
-        p.addChoise("Ramasser la gemme",11);
-        p.addChoise("Regarder attentivement",10);
-        p.addChoise("Faire une danse de la victoire",10);
+        p.addChoise("Ramasser la gemme.",11);
+        p.addChoise("Regarder attentivement.",10);
+        p.addChoise("Faire une danse de la victoire.",10);
         this.story.add(8, p);
 
         p = new Page(
                 10,
                 "simple",
-                "Page 10 - Le temple de Kilroy",
-                "Rien ne semble se passer et rien ne vous indique que vous êtes en danger. ",
+                "Page 10 - Le temple de Kilroy.",
+                "Rien ne semble se passer et rien ne vous indique que vous êtes en danger.",
                 "Que faites vous ?",
                 "radiobutton"
         );
-        p.addChoise("Ramasser la gemme",11);
-        p.addChoise("Ramasser la gemme et sortir",11);
-        p.addChoise("Ramasser la gemme, faire une roulade",11);
+        p.addChoise("Ramasser la gemme.",11);
+        p.addChoise("Ramasser la gemme et sortir.",11);
+        p.addChoise("Ramasser la gemme, faire une roulade.",11);
         this.story.add(9, p);
 
         p = new Page(
                 11,
                 "simple",
-                "Page 11 - Devant le temple",
-                "Vous êtes sorti, vous avez l'artefact demandé par le roi. Vous pourriez lui rapporter.. Ou disparaître avec..",
+                "Page 11 - Devant le temple.",
+                "Vous êtes sorti, vous avez l'artefact demandé par le roi. Vous pourriez lui rapporter... Ou disparaître avec..",
                 "Que vous dicte votre conscience ?",
                 "radiobutton"
         );
-        p.addChoise("La ramener au roi",19);
-        p.addChoise("M'enfuir avec",20);
-        p.addChoise("La manger",18);
+        p.addChoise("La ramener au roi.",19);
+        p.addChoise("M'enfuir avec.",20);
+        p.addChoise("La manger.",18);
         this.story.add(10, p);
 
         p = new Page(
@@ -184,7 +184,7 @@ public class StoryGame {
         p = new Page(
                 13,
                 "end",
-                "Page 13 - MORT !",
+                "Page 13 - MORT !.",
                 "En jetant à manger au loup-garou, vous lui avez ouvert l'appetit… On vous laisse deviner ce qu'il a préféré entre votre petit sandwich et vous.",
                 "",
                 ""
@@ -194,7 +194,7 @@ public class StoryGame {
         p = new Page(
                 14,
                 "end",
-                "Page 14 - MORT !",
+                "Page 14 - MORT !.",
                 "La présence que vous sentiez derrière vous sur le sentier n'était autre que les lianes d'une plante carnivore. Vous êtes actuellement en train d'être digéré.",
                 "",
                 ""
@@ -204,7 +204,7 @@ public class StoryGame {
         p = new Page(
                 15,
                 "end",
-                "Page 15 - MORT !",
+                "Page 15 - MORT !.",
                 "Vous êtes rentré chez le mage sans frapper. Bien sur, un puissant sortillège protegez les lieux. Vous avez été réduit en cendre.",
                 "",
                 ""
@@ -214,7 +214,7 @@ public class StoryGame {
         p = new Page(
                 16,
                 "end",
-                "Page 16 - MORT !",
+                "Page 16 - MORT !.",
                 "On ne crie pas comme ça dans la forêt vindiou ! Vous avez attiré un bon nombre de créatures hostiles. L'une d'entre elle n'a eu qu'à ouvrir la bouche pour vous y faire entrer tout entier.",
                 "",
                 ""
@@ -224,7 +224,7 @@ public class StoryGame {
         p = new Page(
                 17,
                 "end",
-                "Page 17 - MORT !",
+                "Page 17 - MORT !.",
                 "On ne ri pas à la barbe d'un magicien … Il vous transforme en pâté pour son fidèle dragon.",
                 "",
                 ""
@@ -234,7 +234,7 @@ public class StoryGame {
         p = new Page(
                 18,
                 "end",
-                "Page 18 - MORT !",
+                "Page 18 - MORT !.",
                 "Vous venez de manger la gemme. Après avoir essayé de la macher, vous avez tenter de l'avaler d'une traite. Vous mourrez étouffé.",
                 "",
                 ""
@@ -244,7 +244,7 @@ public class StoryGame {
         p = new Page(
                 19,
                 "end",
-                "Page 19 - Félicitations !",
+                "Page 19 - Félicitations !.",
                 "Vous avez apporté au roi la gemme qu'il attendait et plus encore. Il vous couvre d'or, vous offre une aile de son château pour que vous puissez finir vos jours tranquilles… Mais l'aventure semble vous appeler… Resisterez-vous ?",
                 "",
                 ""
@@ -265,12 +265,12 @@ public class StoryGame {
         p = new Page(
                 21,
                 "simple",
-                "Page 21 - Les lartines",
-                "Félicitations, vous vous êtes bien soulagé avant de partir à l'aventure. Et maintenant, on fait quoi hein ? ",
+                "Page 21 - Le marché.",
+                "Félicitations, vous vous êtes bien équipé avant de partir à l'aventure. Votre échauffement est terminé.",
                 "Que faites vous ?",
                 "radiobutton"
         );
-        p.addChoise("Partir dans la forêt",2);
+        p.addChoise("Partir dans la forêt.",2);
         p.addChoise("Dire au roi: Euh.. Non.",12);
         p.addChoise("Bon, vous y aller dans la forêt ?",2);
         this.story.add(20, p);

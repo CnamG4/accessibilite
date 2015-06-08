@@ -11,20 +11,14 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.content.Intent;
 import android.app.Activity;
 import android.util.Log;
+
+import java.lang.String;
 import java.util.Locale;
 import java.util.Random;
 
 public class TTSService extends Activity{
 
     private static TextToSpeech tts;
-
-    public static TextToSpeech getTTS() {
-        if(tts != null) {
-            return tts;
-        }
-        else
-            return null;
-    }
 
     public static TextToSpeech getTTS(Activity a){
         tts = new TextToSpeech(a, new OnInitListener() {
@@ -73,10 +67,19 @@ public class TTSService extends Activity{
             tts.speak(text, TextToSpeech.QUEUE_ADD, null);
         }else {
             tts.speak(text, TextToSpeech.QUEUE_ADD, null);
-        } 
+        }
     }
 
     public static void Stop() {
         tts.stop();
+    }
+
+    public static String GetLanguage(){
+        return tts.getLanguage().getDisplayLanguage();
+
+    }
+
+    public static void SetLanguage(Locale l){
+        tts.setLanguage(l);
     }
 }

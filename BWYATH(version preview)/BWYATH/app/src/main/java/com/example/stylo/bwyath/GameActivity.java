@@ -32,9 +32,7 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
 
     private static View theView;
 
-    private GestureService recognizer;
-
-    private TextToSpeech tts;
+    public static GestureService recognizer;
 
     private VibratorService vibrator;
 
@@ -54,10 +52,10 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         setContentView(R.layout.activity_game);
 
         recognizer = new GestureService((SensorManager) getSystemService(Context.SENSOR_SERVICE));
-        if(MainActivity.lateralite.equals("droitier")) {
+        if(MainActivity.lateralite.equals("droitier")){
             recognizer.setDroitier(true);
         }
-        else {
+        else{
             recognizer.setDroitier(false);
         }
         recognizer.addGesture(GestureService.Gesture.GESTURE_BACK, (long) 350, this);
@@ -68,7 +66,6 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
             System.out.println(e.toString());
         }
         vibrator = new VibratorService(this);
-        tts = TTSService.getTTS();
 
         btn_home = (ImageButton) findViewById(R.id.btn_home);
         btn_home.setOnClickListener(this);
@@ -237,13 +234,6 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        if(MainActivity.lateralite.equals("droitier")) {
-            recognizer.setDroitier(true);
-        }
-        else {
-            recognizer.setDroitier(false);
-        }
     }
 
 
@@ -396,7 +386,11 @@ public class GameActivity extends ActionBarActivity implements View.OnTouchListe
             @Override
             public void run() {
                 if(black) {
-                    theView.setBackgroundResource(R.drawable.validation_droitier);
+                    if(MainActivity.lateralite.equals("droitier")){
+                        theView.setBackgroundResource(R.drawable.validation_droitier);
+                    } else {
+                        theView.setBackgroundResource(R.drawable.validation_gaucher);
+                    }
                 }
                 TTSService.Stop();
                 TTSService.Speak(text);
